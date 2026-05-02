@@ -1,5 +1,6 @@
 <script setup>
 import logoLight from './assets/logos/LogoFitnessConnectLight.png'
+import { events, orte, trainer, formatEventDate, trainerDisplayName } from './data.js'
 </script>
 
 <template>
@@ -72,29 +73,18 @@ import logoLight from './assets/logos/LogoFitnessConnectLight.png'
                 <button class="link-btn">Alle anzeigen →</button>
             </div>
             <div class="events-row">
-                <div class="event-card">
+                <div class="event-card" v-for="event in events" :key="event.name">
                     <div class="event-card-header">
-                        <span class="event-emoji">⚽</span>
-                        <span class="event-tag tag-free">Kostenlos</span>
+                        <span class="event-emoji">{{ event.emoji }}</span>
+                        <span class="event-tag" :class="event.preis ? 'tag-price' : 'tag-free'">
+                            {{ event.preis ? event.preis.toFixed(0) + ' €' : 'Kostenlos' }}
+                        </span>
                     </div>
                     <div class="event-card-body">
-                        <h3 class="event-title">Fußball am See</h3>
-                        <p class="event-detail">📍 Sportanlage Konstanz</p>
-                        <p class="event-detail">📅 Sa, 05.04. · 10:00</p>
-                        <p class="event-spots">8/12 Plätze frei</p>
-                        <button class="btn-default">Teilnehmen</button>
-                    </div>
-                </div>
-                <div class="event-card">
-                    <div class="event-card-header">
-                        <span class="event-emoji">🧘</span>
-                        <span class="event-tag tag-price">15 €</span>
-                    </div>
-                    <div class="event-card-body">
-                        <h3 class="event-title">Yoga im Studio</h3>
-                        <p class="event-detail">📍 Club-Aktiv Konstanz</p>
-                        <p class="event-detail">📅 So, 06.04. · 09:00</p>
-                        <p class="event-spots">11/12 Plätze frei</p>
+                        <h3 class="event-title">{{ event.name }}</h3>
+                        <p class="event-detail">📍 {{ event.ortName }}</p>
+                        <p class="event-detail">📅 {{ formatEventDate(event.date) }}</p>
+                        <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
                         <button class="btn-default">Teilnehmen</button>
                     </div>
                 </div>
@@ -107,19 +97,11 @@ import logoLight from './assets/logos/LogoFitnessConnectLight.png'
                 <button class="link-btn">Alle anzeigen →</button>
             </div>
             <div class="orte-row">
-                <div class="ort-card">
-                    <img src="/orteImages/happy-fit.jpg" alt="Happy-Fit Konstanz" class="ort-image">
+                <div class="ort-card" v-for="ort in orte" :key="ort.name">
+                    <img :src="ort.bild_pfad" :alt="ort.name" class="ort-image">
                     <div class="ort-card-body">
-                        <h3 class="ort-title">Happy-Fit Konstanz</h3>
-                        <p class="ort-address">📍 Line-Eid-Straße 6, 78467 Konstanz</p>
-                        <button class="btn-default">Ansehen</button>
-                    </div>
-                </div>
-                <div class="ort-card">
-                    <img src="/orteImages/calisthenics.png" alt="Calisthenics-Park" class="ort-image">
-                    <div class="ort-card-body">
-                        <h3 class="ort-title">Calisthenics-Park</h3>
-                        <p class="ort-address">📍 Gemeinschaftsschule Konstanz</p>
+                        <h3 class="ort-title">{{ ort.name }}</h3>
+                        <p class="ort-address">📍 {{ ort.adresse }}</p>
                         <button class="btn-default">Ansehen</button>
                     </div>
                 </div>
@@ -132,48 +114,12 @@ import logoLight from './assets/logos/LogoFitnessConnectLight.png'
                 <button class="link-btn">Alle anzeigen →</button>
             </div>
             <div class="trainer-row">
-                <div class="trainer-card">
-                    <img src="/TrainerImages/IlyasK.png" alt="Ilyas K." class="trainer-image">
+                <div class="trainer-card" v-for="t in trainer" :key="t.kontoinhaber">
+                    <img :src="t.profilbild_pfad" :alt="trainerDisplayName(t)" class="trainer-image">
                     <div class="trainer-card-body">
                         <div>
-                            <h3 class="trainer-name">Ilyas K.</h3>
-                            <p class="trainer-detail">Fitness · ⭐ 4.8</p>
-                        </div>
-                        <div>
-                            <button class="btn-default">Profil ansehen</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="trainer-card">
-                    <img src="/TrainerImages/LisaM.png" alt="Lisa M." class="trainer-image">
-                    <div class="trainer-card-body">
-                        <div>
-                            <h3 class="trainer-name">Lisa M.</h3>
-                            <p class="trainer-detail">Yoga · ⭐ 4.9</p>
-                        </div>
-                        <div>
-                            <button class="btn-default">Profil ansehen</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="trainer-card">
-                    <img src="/TrainerImages/MaxS.png" alt="Max S." class="trainer-image">
-                    <div class="trainer-card-body">
-                        <div class="trainer-name-container">
-                            <h3 class="trainer-name">Max S.</h3>
-                            <p class="trainer-detail">Fußball · ⭐ 4.5</p>
-                        </div>
-                        <div class="trainer-button">
-                            <button class="btn-default">Profil ansehen</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="trainer-card">
-                    <img src="/TrainerImages/AlidaW.png" alt="Alida W." class="trainer-image">
-                    <div class="trainer-card-body">
-                        <div>
-                            <h3 class="trainer-name">Alida W.</h3>
-                            <p class="trainer-detail">Calisthenics · ⭐ 1.2</p>
+                            <h3 class="trainer-name">{{ trainerDisplayName(t) }}</h3>
+                            <p class="trainer-detail">{{ t.trainerart }} · ⭐ {{ t.bewertung }}</p>
                         </div>
                         <div>
                             <button class="btn-default">Profil ansehen</button>

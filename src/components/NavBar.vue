@@ -1,6 +1,9 @@
 <script setup>
 import logoLight from '../assets/logos/LogoFitnessConnectLight.png'
 import NavButton from './NavButton.vue'
+import { useBannerStore } from '../stores/banner.js'
+
+const bannerStore = useBannerStore()
 </script>
 
 <template>
@@ -28,8 +31,9 @@ import NavButton from './NavButton.vue'
     flex-direction: row;
     align-items: center;
     position: fixed;
-    top: 0;
-    z-index: 10;
+    top: v-bind('bannerStore.isVisible ? "40px" : "0px"');
+    z-index: 100;
+    transition: top 0.2s ease;
     overflow-x: auto;
 }
 

@@ -1,14 +1,18 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { events, formatEventDate, trainerDisplayName } from '../data.js'
+import { useEventsStore } from '../stores/events.js'
+import { formatEventDate, trainerDisplayName } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 
 const route = useRoute()
 const router = useRouter()
+const eventsStore = useEventsStore()
 
-const event = computed(() => events.find(e => e.id === Number(route.params.id)))
+onMounted(() => eventsStore.fetchAll())
+
+const event = computed(() => eventsStore.list.find(e => e.id === Number(route.params.id)))
 </script>
 
 <template>
@@ -59,7 +63,9 @@ const event = computed(() => events.find(e => e.id === Number(route.params.id)))
     </div>
 
     <div v-else class="not-found">
-      <p>Event nicht gefunden.</p>
+      <p v-if="eventsStore.error">⚠️ {{ eventsStore.error }}</p>
+      <p v-else-if="eventsStore.loading">Lade…</p>
+      <p v-else>Event nicht gefunden.</p>
       <button class="back-btn" @click="router.push('/')">← Zur Startseite</button>
     </div>
   </main>

@@ -1,21 +1,28 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { orte } from '../data.js'
+import { useOrteStore } from '../stores/orte.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 
 const route = useRoute()
 const router = useRouter()
+const orteStore = useOrteStore()
 
-const ort = computed(() => orte.find(o => o.id === Number(route.params.id)))
+onMounted(() => orteStore.fetchAll())
+
+const ort = computed(() => orteStore.list.find(o => o.id === Number(route.params.id)))
 </script>
 
 <template>
   <NavBar />
 
   <main class="main-content">
-    <div v-if="ort" class="detail-page">
+    <div v-if="orteStore.error" class="not-found">
+      <p>⚠️ {{ orteStore.error }}</p>
+      <button class="back-btn" @click="router.push('/')">← Zur Startseite</button>
+    </div>
+    <div v-else-if="ort" class="detail-page">
       <button class="back-btn" @click="router.back()">← Zurück</button>
 
       <div class="ort-hero">
@@ -41,7 +48,8 @@ const ort = computed(() => orte.find(o => o.id === Number(route.params.id)))
     </div>
 
     <div v-else class="not-found">
-      <p>Ort nicht gefunden.</p>
+      <p v-if="orteStore.loading">Lade…</p>
+      <p v-else>Ort nicht gefunden.</p>
       <button class="back-btn" @click="router.push('/')">← Zur Startseite</button>
     </div>
   </main>

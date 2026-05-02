@@ -1,21 +1,27 @@
 <script setup>
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBannerStore } from '../stores/banner.js'
-import { fussballAmSee } from '../data.js'
+import { useEventsStore } from '../stores/events.js'
 
 const router = useRouter()
 const bannerStore = useBannerStore()
+const eventsStore = useEventsStore()
+
+onMounted(() => eventsStore.fetchAll())
+
+const eventOfDay = computed(() => eventsStore.list[0] ?? null)
 
 function goToEvent() {
-  router.push('/event/' + fussballAmSee.id)
+  if (eventOfDay.value) router.push('/event/' + eventOfDay.value.id)
 }
 </script>
 
 <template>
-  <div v-if="bannerStore.isVisible" class="special-banner" @click="goToEvent">
-    <span class="banner-emoji">{{ fussballAmSee.emoji }}</span>
+  <div v-if="bannerStore.isVisible && eventOfDay" class="special-banner" @click="goToEvent">
+    <span class="banner-emoji">{{ eventOfDay.emoji }}</span>
     <span class="banner-text">
-      <strong>Event des Tages:</strong> {{ fussballAmSee.name }} — Jetzt anmelden!
+      <strong>Event des Tages:</strong> {{ eventOfDay.name }} — Jetzt anmelden!
     </span>
     <button class="banner-ok" @click.stop="bannerStore.hideBanner()">OK</button>
   </div>

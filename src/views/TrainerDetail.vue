@@ -1,14 +1,18 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { trainer, trainerDisplayName } from '../data.js'
+import { useTrainerStore } from '../stores/trainer.js'
+import { trainerDisplayName } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 
 const route = useRoute()
 const router = useRouter()
+const trainerStore = useTrainerStore()
 
-const t = computed(() => trainer.find(t => t.id === Number(route.params.id)))
+onMounted(() => trainerStore.fetchAll())
+
+const t = computed(() => trainerStore.list.find(t => t.id === Number(route.params.id)))
 
 function renderStars(rating) {
   const full = Math.floor(rating)
@@ -21,7 +25,11 @@ function renderStars(rating) {
   <NavBar />
 
   <main class="main-content">
-    <div v-if="t" class="detail-page">
+    <div v-if="trainerStore.error" class="not-found">
+      <p>⚠️ {{ trainerStore.error }}</p>
+      <button class="back-btn" @click="router.push('/')">← Zur Startseite</button>
+    </div>
+    <div v-else-if="t" class="detail-page">
       <button class="back-btn" @click="router.back()">← Zurück</button>
 
       <div class="profile-hero">
@@ -72,7 +80,8 @@ function renderStars(rating) {
     </div>
 
     <div v-else class="not-found">
-      <p>Trainer nicht gefunden.</p>
+      <p v-if="trainerStore.loading">Lade…</p>
+      <p v-else>Trainer nicht gefunden.</p>
       <button class="back-btn" @click="router.push('/')">← Zur Startseite</button>
     </div>
   </main>

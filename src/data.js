@@ -3,7 +3,10 @@
 // =====================
 
 export class Trainer {
+  static #nextId = 1
+
   constructor({ trainerart, kontoinhaber, iban, bic, telefonnummer, bewertung, zitat, profilbild_pfad }) {
+    this.id = Trainer.#nextId++
     this.trainerart = trainerart
     this.kontoinhaber = kontoinhaber
     this.iban = iban
@@ -16,7 +19,10 @@ export class Trainer {
 }
 
 export class Ort {
+  static #nextId = 1
+
   constructor({ name, adresse, art, bild_pfad }) {
+    this.id = Ort.#nextId++
     this.name = name
     this.adresse = adresse
     this.art = art
@@ -25,7 +31,10 @@ export class Ort {
 }
 
 export class Event {
+  static #nextId = 1
+
   constructor({ name, sportart, date, anzahlPlaetze, belegtePlaetze = 0, ortName = '', emoji = '📅' }) {
+    this.id = Event.#nextId++
     this.name = name
     this.sportart = sportart
     this.date = new Date(date)

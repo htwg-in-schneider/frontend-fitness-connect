@@ -1,6 +1,9 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
+
+const router = useRouter()
 
 defineProps({
     orte: {
@@ -17,12 +20,12 @@ defineProps({
             <NavigationLink>Alle anzeigen →</NavigationLink>
         </div>
         <div class="orte-row">
-            <div class="ort-card" v-for="ort in orte" :key="ort.name">
+            <div class="ort-card" v-for="ort in orte" :key="ort.id">
                 <img :src="ort.bild_pfad" :alt="ort.name" class="ort-image">
                 <div class="ort-card-body">
                     <h3 class="ort-title">{{ ort.name }}</h3>
                     <p class="ort-address">📍 {{ ort.adresse }}</p>
-                    <Button>Ansehen</Button>
+                    <Button @click="router.push('/ort/' + ort.id)">Ansehen</Button>
                 </div>
             </div>
         </div>

@@ -1,7 +1,10 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import { formatEventDate } from '../data.js'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
+
+const router = useRouter()
 
 defineProps({
     events: {
@@ -18,7 +21,7 @@ defineProps({
             <NavigationLink>Alle anzeigen →</NavigationLink>
         </div>
         <div class="events-row">
-            <div class="event-card" v-for="event in events" :key="event.name">
+            <div class="event-card" v-for="event in events" :key="event.id">
                 <div class="event-card-header">
                     <span class="event-emoji">{{ event.emoji }}</span>
                     <span class="event-tag" :class="event.preis ? 'tag-price' : 'tag-free'">
@@ -30,7 +33,7 @@ defineProps({
                     <p class="event-detail">📍 {{ event.ortName }}</p>
                     <p class="event-detail">📅 {{ formatEventDate(event.date) }}</p>
                     <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
-                    <Button>Teilnehmen</Button>
+                    <Button @click="router.push('/event/' + event.id)">Teilnehmen</Button>
                 </div>
             </div>
         </div>

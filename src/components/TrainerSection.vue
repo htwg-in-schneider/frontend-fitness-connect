@@ -1,7 +1,10 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import { trainerDisplayName } from '../data.js'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
+
+const router = useRouter()
 
 defineProps({
     trainer: {
@@ -18,7 +21,7 @@ defineProps({
             <NavigationLink>Alle anzeigen →</NavigationLink>
         </div>
         <div class="trainer-row">
-            <div class="trainer-card" v-for="t in trainer" :key="t.kontoinhaber">
+            <div class="trainer-card" v-for="t in trainer" :key="t.id">
                 <img :src="t.profilbild_pfad" :alt="trainerDisplayName(t)" class="trainer-image">
                 <div class="trainer-card-body">
                     <div>
@@ -26,7 +29,7 @@ defineProps({
                         <p class="trainer-detail">{{ t.trainerart }} · ⭐ {{ t.bewertung }}</p>
                     </div>
                     <div>
-                        <Button>Profil ansehen</Button>
+                        <Button @click="router.push('/trainer/' + t.id)">Profil ansehen</Button>
                     </div>
                 </div>
             </div>

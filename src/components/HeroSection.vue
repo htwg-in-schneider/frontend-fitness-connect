@@ -1,5 +1,6 @@
 <script setup>
 import Button from './Button.vue'
+import NavigationLink from './NavigationLink.vue';
 </script>
 
 <template>
@@ -11,11 +12,10 @@ import Button from './Button.vue'
             </div>
             <div class="hero-divider"></div>
             <div class="login-form">
-                <h3 class="login-title">Anmelden</h3>
-                <input class="login-input" type="text" placeholder="Benutzername">
-                <input class="login-input" type="password" placeholder="Passwort">
-                <Button>Anmelden</Button>
-                <Button variant="secondary">Registrieren</Button>
+                <h3 class="login-title">Jetzt Restrieren:</h3>
+                <input class="login-input" type="text" placeholder="E-Mail">
+                <Button>Registrieren</Button>
+                <NavigationLink>Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
             </div>
         </div>
     </section>

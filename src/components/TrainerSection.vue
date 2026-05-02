@@ -15,7 +15,7 @@ defineProps({
     <section class="page-section section-trainer">
         <div class="section-header">
             <h2 class="section-title">Trainer</h2>
-            <NavigationLink />
+            <NavigationLink>Alle anzeigen →</NavigationLink>
         </div>
         <div class="trainer-row">
             <div class="trainer-card" v-for="t in trainer" :key="t.kontoinhaber">

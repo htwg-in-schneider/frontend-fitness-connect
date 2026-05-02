@@ -14,7 +14,7 @@ defineProps({
     <section class="page-section section-orte">
         <div class="section-header">
             <h2 class="section-title">Orte</h2>
-            <NavigationLink />
+            <NavigationLink>Alle anzeigen →</NavigationLink>
         </div>
         <div class="orte-row">
             <div class="ort-card" v-for="ort in orte" :key="ort.name">

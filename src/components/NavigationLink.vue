@@ -1,9 +1,5 @@
 <script setup>
 defineProps({
-    label: {
-        type: String,
-        default: 'Alle anzeigen →',
-    },
     href: {
         type: String,
         default: null,
@@ -12,8 +8,8 @@ defineProps({
 </script>
 
 <template>
-    <a v-if="href" :href="href" class="nav-link">{{ label }}</a>
-    <button v-else type="button" class="nav-link">{{ label }}</button>
+    <a v-if="href" :href="href" class="nav-link"><slot /></a>
+    <button v-else type="button" class="nav-link"><slot /></button>
 </template>
 
 <style scoped>

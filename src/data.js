@@ -2,6 +2,13 @@
 // Klassen
 // =====================
 
+// Prepends the Vite base URL so asset paths work both locally (/) and
+// on GitHub Pages (/frontend-fitness-connect/).
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
+function assetUrl(path) {
+  return base + path
+}
+
 export class Trainer {
   static #nextId = 1
 
@@ -69,7 +76,7 @@ export const ilyasK = new Trainer({
   telefonnummer: '+49 151 23456789',
   bewertung: 4.8,
   zitat: 'Dein Körper kann alles – überzeuge zuerst deinen Kopf.',
-  profilbild_pfad: '/TrainerImages/IlyasK.png',
+  profilbild_pfad: assetUrl('/TrainerImages/IlyasK.png'),
 })
 
 export const lisaM = new Trainer({
@@ -80,7 +87,7 @@ export const lisaM = new Trainer({
   telefonnummer: '+49 152 34567890',
   bewertung: 4.9,
   zitat: 'Yoga verbindet Körper, Geist und Seele.',
-  profilbild_pfad: '/TrainerImages/LisaM.png',
+  profilbild_pfad: assetUrl('/TrainerImages/LisaM.png'),
 })
 
 export const maxS = new Trainer({
@@ -91,7 +98,7 @@ export const maxS = new Trainer({
   telefonnummer: '+49 176 45678901',
   bewertung: 4.5,
   zitat: 'Teamwork macht den Traum wahr.',
-  profilbild_pfad: '/TrainerImages/MaxS.png',
+  profilbild_pfad: assetUrl('/TrainerImages/MaxS.png'),
 })
 
 export const alidaW = new Trainer({
@@ -102,7 +109,7 @@ export const alidaW = new Trainer({
   telefonnummer: '+49 157 56789012',
   bewertung: 1.2,
   zitat: 'Bodyweight is the best weight.',
-  profilbild_pfad: '/TrainerImages/AlidaW.png',
+  profilbild_pfad: assetUrl('/TrainerImages/AlidaW.png'),
 })
 
 export const trainer = [ilyasK, lisaM, maxS, alidaW]
@@ -115,14 +122,14 @@ export const happyFit = new Ort({
   name: 'Happy-Fit Konstanz',
   adresse: 'Line-Eid-Straße 6, 78467 Konstanz',
   art: 'Fitnessstudio',
-  bild_pfad: '/orteImages/happy-fit.jpg',
+  bild_pfad: assetUrl('/orteImages/happy-fit.jpg'),
 })
 
 export const calisthenicsPark = new Ort({
   name: 'Calisthenics-Park',
   adresse: 'Gemeinschaftsschule Konstanz',
   art: 'Outdoor',
-  bild_pfad: '/orteImages/calisthenics.png',
+  bild_pfad: assetUrl('/orteImages/calisthenics.png'),
 })
 
 export const orte = [happyFit, calisthenicsPark]

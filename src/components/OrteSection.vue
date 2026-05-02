@@ -1,4 +1,7 @@
 <script setup>
+import Button from './Button.vue'
+import NavigationLink from './NavigationLink.vue'
+
 defineProps({
     orte: {
         type: Array,
@@ -11,7 +14,7 @@ defineProps({
     <section class="page-section section-orte">
         <div class="section-header">
             <h2 class="section-title">Orte</h2>
-            <button class="link-btn">Alle anzeigen →</button>
+            <NavigationLink />
         </div>
         <div class="orte-row">
             <div class="ort-card" v-for="ort in orte" :key="ort.name">
@@ -19,7 +22,7 @@ defineProps({
                 <div class="ort-card-body">
                     <h3 class="ort-title">{{ ort.name }}</h3>
                     <p class="ort-address">📍 {{ ort.adresse }}</p>
-                    <button class="btn-default">Ansehen</button>
+                    <Button>Ansehen</Button>
                 </div>
             </div>
         </div>

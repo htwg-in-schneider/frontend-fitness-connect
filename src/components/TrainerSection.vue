@@ -1,5 +1,7 @@
 <script setup>
 import { trainerDisplayName } from '../data.js'
+import Button from './Button.vue'
+import NavigationLink from './NavigationLink.vue'
 
 defineProps({
     trainer: {
@@ -13,7 +15,7 @@ defineProps({
     <section class="page-section section-trainer">
         <div class="section-header">
             <h2 class="section-title">Trainer</h2>
-            <button class="link-btn">Alle anzeigen →</button>
+            <NavigationLink />
         </div>
         <div class="trainer-row">
             <div class="trainer-card" v-for="t in trainer" :key="t.kontoinhaber">
@@ -24,7 +26,7 @@ defineProps({
                         <p class="trainer-detail">{{ t.trainerart }} · ⭐ {{ t.bewertung }}</p>
                     </div>
                     <div>
-                        <button class="btn-default">Profil ansehen</button>
+                        <Button>Profil ansehen</Button>
                     </div>
                 </div>
             </div>

@@ -1,5 +1,7 @@
 <script setup>
 import { formatEventDate } from '../data.js'
+import Button from './Button.vue'
+import NavigationLink from './NavigationLink.vue'
 
 defineProps({
     events: {
@@ -13,7 +15,7 @@ defineProps({
     <section class="page-section section-events">
         <div class="section-header">
             <h2 class="section-title">Events</h2>
-            <button class="link-btn">Alle anzeigen →</button>
+            <NavigationLink />
         </div>
         <div class="events-row">
             <div class="event-card" v-for="event in events" :key="event.name">
@@ -28,7 +30,7 @@ defineProps({
                     <p class="event-detail">📍 {{ event.ortName }}</p>
                     <p class="event-detail">📅 {{ formatEventDate(event.date) }}</p>
                     <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
-                    <button class="btn-default">Teilnehmen</button>
+                    <Button>Teilnehmen</Button>
                 </div>
             </div>
         </div>

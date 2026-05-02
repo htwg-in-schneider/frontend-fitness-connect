@@ -1,4 +1,5 @@
 <script setup>
+import Button from './Button.vue'
 </script>
 
 <template>
@@ -13,8 +14,8 @@
                 <h3 class="login-title">Anmelden</h3>
                 <input class="login-input" type="text" placeholder="Benutzername">
                 <input class="login-input" type="password" placeholder="Passwort">
-                <button class="btn-action btn-action-primary">Anmelden</button>
-                <button class="btn-action btn-action-disabled">Registrieren</button>
+                <Button>Anmelden</Button>
+                <Button variant="secondary">Registrieren</Button>
             </div>
         </div>
     </section>
@@ -107,38 +108,6 @@
     color: #1E293B;
     outline: none;
     background: #F8FAFC;
-}
-
-.btn-action {
-    display: block;
-    width: 100%;
-    padding: 9px 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 10px;
-    font-weight: bold;
-    font-family: "Arial", sans-serif;
-    cursor: pointer;
-    text-align: center;
-    margin-bottom: 8px;
-}
-
-.btn-action-primary {
-    background: #C00000;
-    color: #FFFFFF;
-}
-
-.btn-action-disabled {
-    background: #94A3B8;
-    color: #FFFFFF;
-}
-
-.btn-action-primary:hover {
-    background: #A00000;
-}
-
-.btn-action-disabled:hover {
-    background: #7C8FA0;
 }
 
 @media (max-width: 768px) {

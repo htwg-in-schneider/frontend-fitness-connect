@@ -30,7 +30,7 @@ defineProps({
                 </div>
                 <div class="event-card-body">
                     <h3 class="event-title">{{ event.name }}</h3>
-                    <p class="event-detail">📍 {{ event.ortName }}</p>
+                    <p class="event-detail">📍 {{ event.ort.name }}</p>
                     <p class="event-detail">📅 {{ formatEventDate(event.date) }}</p>
                     <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
                     <Button @click="router.push('/event/' + event.id)">Teilnehmen</Button>

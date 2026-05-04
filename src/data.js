@@ -1,7 +1,3 @@
-// =====================
-// Klassen
-// =====================
-
 // Prepends the Vite base URL so asset paths work both locally (/) and
 // on GitHub Pages (/frontend-fitness-connect/).
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
@@ -9,11 +5,21 @@ function assetUrl(path) {
   return base + path
 }
 
-export class Trainer {
-  static #nextId = 1
+// =====================
+// Klassen
+// =====================
 
-  constructor({ trainerart, kontoinhaber, iban, bic, telefonnummer, bewertung, zitat, profilbild_pfad }) {
-    this.id = Trainer.#nextId++
+export class Nutzer {
+  constructor({ id, name, email }) {
+    this.id = id
+    this.name = name
+    this.email = email
+  }
+}
+
+export class Trainer {
+  constructor({ id, trainerart, kontoinhaber, iban, bic, telefonnummer, bewertung, zitat, profilbild_pfad }) {
+    this.id = id
     this.trainerart = trainerart
     this.kontoinhaber = kontoinhaber
     this.iban = iban
@@ -26,10 +32,8 @@ export class Trainer {
 }
 
 export class Ort {
-  static #nextId = 1
-
-  constructor({ name, adresse, art, bild_pfad }) {
-    this.id = Ort.#nextId++
+  constructor({ id, name, adresse, art, bild_pfad }) {
+    this.id = id
     this.name = name
     this.adresse = adresse
     this.art = art
@@ -38,37 +42,59 @@ export class Ort {
 }
 
 export class Event {
-  static #nextId = 1
-
-  constructor({ name, sportart, date, anzahlPlaetze, belegtePlaetze = 0, ortName = '', emoji = '📅' }) {
-    this.id = Event.#nextId++
+  constructor({ id, name, sportart, date, anzahlPlaetze, belegtePlaetze, freiePlaetze, emoji, ort, ersteller, teilnehmer }) {
+    this.id = id
     this.name = name
     this.sportart = sportart
-    this.date = new Date(date)
+    this.date = date
     this.anzahlPlaetze = anzahlPlaetze
     this.belegtePlaetze = belegtePlaetze
-    this.ortName = ortName
+    this.freiePlaetze = freiePlaetze
     this.emoji = emoji
-  }
-
-  get freiePlaetze() {
-    return this.anzahlPlaetze - this.belegtePlaetze
+    this.ort = ort
+    this.ersteller = ersteller
+    this.teilnehmer = teilnehmer
   }
 }
 
 export class Kurs extends Event {
-  constructor({ trainer, preis, ...rest }) {
+  constructor({ preis, trainer, ...rest }) {
     super(rest)
-    this.trainer = trainer
     this.preis = preis
+    this.trainer = trainer
   }
 }
+
+// =====================
+// Nutzer-Daten
+// =====================
+
+export const annaB = new Nutzer({
+  id: 1,
+  name: 'Anna Bauer',
+  email: 'anna.bauer@example.com',
+})
+
+export const tomF = new Nutzer({
+  id: 2,
+  name: 'Tom Fischer',
+  email: 'tom.fischer@example.com',
+})
+
+export const saraK = new Nutzer({
+  id: 3,
+  name: 'Sara Klein',
+  email: 'sara.klein@example.com',
+})
+
+export const users = [annaB, tomF, saraK]
 
 // =====================
 // Trainer-Daten
 // =====================
 
 export const ilyasK = new Trainer({
+  id: 1,
   trainerart: 'Fitness',
   kontoinhaber: 'Ilyas Kaya',
   iban: 'DE12500105170648489890',
@@ -80,6 +106,7 @@ export const ilyasK = new Trainer({
 })
 
 export const lisaM = new Trainer({
+  id: 2,
   trainerart: 'Yoga',
   kontoinhaber: 'Lisa Müller',
   iban: 'DE75200400600310028600',
@@ -91,6 +118,7 @@ export const lisaM = new Trainer({
 })
 
 export const maxS = new Trainer({
+  id: 3,
   trainerart: 'Fußball',
   kontoinhaber: 'Max Schneider',
   iban: 'DE91100000000123456789',
@@ -102,6 +130,7 @@ export const maxS = new Trainer({
 })
 
 export const alidaW = new Trainer({
+  id: 4,
   trainerart: 'Calisthenics',
   kontoinhaber: 'Alida Wolf',
   iban: 'DE56200700240012345600',
@@ -119,6 +148,7 @@ export const trainer = [ilyasK, lisaM, maxS, alidaW]
 // =====================
 
 export const happyFit = new Ort({
+  id: 1,
   name: 'Happy-Fit Konstanz',
   adresse: 'Line-Eid-Straße 6, 78467 Konstanz',
   art: 'Fitnessstudio',
@@ -126,6 +156,7 @@ export const happyFit = new Ort({
 })
 
 export const calisthenicsPark = new Ort({
+  id: 2,
   name: 'Calisthenics-Park',
   adresse: 'Gemeinschaftsschule Konstanz',
   art: 'Outdoor',
@@ -139,27 +170,33 @@ export const orte = [happyFit, calisthenicsPark]
 // =====================
 
 export const fussballAmSee = new Event({
+  id: 1,
   name: 'Fußball am See',
   sportart: 'Fußball',
-  date: '2026-04-05T10:00:00',
+  date: new Date('2026-04-05T10:00:00'),
   anzahlPlaetze: 12,
   belegtePlaetze: 4,
-  ortName: 'Sportanlage Konstanz',
+  freiePlaetze: 8,
   emoji: '⚽',
+  ort: happyFit,
+  ersteller: tomF,
+  teilnehmer: [annaB, saraK],
 })
 
-// Kurs: kostenpflichtiges Event mit Trainer
-// Trainer lisaM passt zur Sportart Yoga – wird noch nicht auf der Seite angezeigt
 export const yogaImStudio = new Kurs({
+  id: 2,
   name: 'Yoga im Studio',
   sportart: 'Yoga',
-  date: '2026-04-06T09:00:00',
+  date: new Date('2026-04-06T09:00:00'),
   anzahlPlaetze: 12,
   belegtePlaetze: 1,
-  ortName: 'Club-Aktiv Konstanz',
+  freiePlaetze: 11,
   emoji: '🧘',
-  trainer: lisaM,
   preis: 15.0,
+  ort: calisthenicsPark,
+  trainer: lisaM,
+  ersteller: annaB,
+  teilnehmer: [tomF],
 })
 
 export const events = [fussballAmSee, yogaImStudio]

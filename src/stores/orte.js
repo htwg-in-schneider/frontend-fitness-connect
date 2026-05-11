@@ -1,16 +1,15 @@
 import { defineStore } from 'pinia'
-import { orte } from '../data.js'
 
 export const useOrteStore = defineStore('orte', {
   state: () => ({
     list: [],
-    loading: false,
-    error: null,
   }),
   actions: {
     async fetchAll() {
       if (this.list.length) return
-      this.list = orte
+      const res = await fetch('http://localhost:8081/api/orte')
+      const data = await res.json()
+      this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl }))
     },
   },
 })

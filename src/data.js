@@ -199,7 +199,23 @@ export const yogaImStudio = new Kurs({
   teilnehmer: [tomF],
 })
 
-export const events = [fussballAmSee, yogaImStudio]
+export const CalisthenicsAmPark = new Kurs({
+  id: 3,
+  name: 'Calisthenics am Park',
+  sportart: 'Calisthenics',
+  date: new Date('2026-04-07T18:00:00'),
+  anzahlPlaetze: 10,
+  belegtePlaetze: 9,
+  freiePlaetze: 1,
+  emoji: '💪',
+  preis: 20.0,
+  ort: calisthenicsPark,
+  trainer: alidaW,
+  ersteller: saraK,
+  teilnehmer: [annaB, tomF, saraK, ilyasK, lisaM, maxS, alidaW],
+})
+
+export const events = [fussballAmSee, yogaImStudio, CalisthenicsAmPark]
 
 // =====================
 // Hilfsfunktionen

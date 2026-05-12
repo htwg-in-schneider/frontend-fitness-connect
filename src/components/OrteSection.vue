@@ -17,7 +17,7 @@ defineProps({
     <section class="page-section section-orte">
         <div class="section-header">
             <h2 class="section-title">Orte</h2>
-            <NavigationLink>Alle anzeigen →</NavigationLink>
+            <NavigationLink @click="router.push('/orte')">Alle anzeigen →</NavigationLink>
         </div>
         <div class="orte-row">
             <div class="ort-card" v-for="ort in orte" :key="ort.id">

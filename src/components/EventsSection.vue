@@ -18,7 +18,7 @@ defineProps({
     <section class="page-section section-events">
         <div class="section-header">
             <h2 class="section-title">Events</h2>
-            <NavigationLink>Alle anzeigen →</NavigationLink>
+            <NavigationLink @click="router.push('/events')">Alle anzeigen →</NavigationLink>
         </div>
         <div class="events-row">
             <div class="event-card" v-for="event in events" :key="event.id">

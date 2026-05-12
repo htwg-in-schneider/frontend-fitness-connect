@@ -1,18 +1,28 @@
 import { defineStore } from 'pinia'
 
+const API = import.meta.env.VITE_API_BASE_URL
+
 export const useOrteStore = defineStore('orte', {
   state: () => ({
     list: [],
+    arten: [],
   }),
   actions: {
     async fetchAll() {
       if (this.list.length) return
-      await this.search('')
+      await this.search({})
     },
-    async search(query) {
-      const base = 'http://localhost:8081/api/orte'
-      const url = query ? `${base}?suche=${encodeURIComponent(query)}` : base
-      const res = await fetch(url)
+    async fetchArten() {
+      if (this.arten.length) return
+      const res = await fetch(`${API}/api/orte/arten`)
+      this.arten = await res.json()
+    },
+    async search({ suche = '', art = '' } = {}) {
+      const params = new URLSearchParams()
+      if (suche) params.set('suche', suche)
+      if (art) params.set('art', art)
+      const qs = params.toString()
+      const res = await fetch(`${API}/api/orte${qs ? '?' + qs : ''}`)
       const data = await res.json()
       this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl }))
     },

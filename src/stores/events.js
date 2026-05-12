@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 
+const API = import.meta.env.VITE_API_BASE_URL
+
 function mapEvent(raw) {
   return {
     id: raw.id,
@@ -21,18 +23,25 @@ function mapEvent(raw) {
 export const useEventsStore = defineStore('events', {
   state: () => ({
     list: [],
+    sportarten: [],
   }),
   actions: {
     async fetchAll() {
       if (this.list.length) return
-      await this.search('')
+      await this.search({})
     },
-    async search(query) {
-      const base = 'http://localhost:8081/api/events'
-      const url = query ? `${base}?suche=${encodeURIComponent(query)}` : base
-      const res = await fetch(url)
+    async fetchSportarten() {
+      if (this.sportarten.length) return
+      const res = await fetch(`${API}/api/events/sportarten`)
+      this.sportarten = await res.json()
+    },
+    async search({ suche = '', sportart = '' } = {}) {
+      const params = new URLSearchParams()
+      if (suche) params.set('suche', suche)
+      if (sportart) params.set('sportart', sportart)
+      const qs = params.toString()
+      const res = await fetch(`${API}/api/events${qs ? '?' + qs : ''}`)
       const data = await res.json()
-      console.log('Fetched events:', data)
       this.list = data.map(mapEvent)
     },
   },

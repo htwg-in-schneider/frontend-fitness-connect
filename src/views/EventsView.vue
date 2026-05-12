@@ -11,21 +11,26 @@ const router = useRouter()
 const eventsStore = useEventsStore()
 
 const eingabe = ref(route.query.suche ?? '')
+const sportart = ref(route.query.sportart ?? '')
 
-async function suchen() {
+function suchen() {
   const q = eingabe.value.trim()
-  router.replace({ path: '/events', query: q ? { suche: q } : {} })
+  const s = sportart.value
+  const query = {}
+  if (q) query.suche = q
+  if (s) query.sportart = s
+  router.replace({ path: '/events', query })
 }
 
 onMounted(async () => {
-  const q = route.query.suche ?? ''
-  eingabe.value = q
-  await eventsStore.search(q)
+  await eventsStore.fetchSportarten()
+  await eventsStore.search({ suche: eingabe.value, sportart: sportart.value })
 })
 
-watch(() => route.query.suche, async (val) => {
-  eingabe.value = val ?? ''
-  await eventsStore.search(val ?? '')
+watch(() => route.query, async (q) => {
+  eingabe.value = q.suche ?? ''
+  sportart.value = q.sportart ?? ''
+  await eventsStore.search({ suche: eingabe.value, sportart: sportart.value })
 })
 </script>
 
@@ -45,6 +50,10 @@ watch(() => route.query.suche, async (val) => {
             placeholder="Event oder Kurs finden…"
             @keyup.enter="suchen"
           />
+          <select v-model="sportart" class="filter-select">
+            <option value="">Alle Sportarten</option>
+            <option v-for="s in eventsStore.sportarten" :key="s" :value="s">{{ s }}</option>
+          </select>
           <Button @click="suchen">Suchen</Button>
         </div>
       </div>
@@ -120,6 +129,21 @@ watch(() => route.query.suche, async (val) => {
 }
 
 .search-input:focus {
+  border-color: #3B82F6;
+  background: #fff;
+}
+
+.filter-select {
+  padding: 10px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #F8FAFC;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-select:focus {
   border-color: #3B82F6;
   background: #fff;
 }
@@ -212,7 +236,8 @@ watch(() => route.query.suche, async (val) => {
     align-items: stretch;
   }
 
-  .search-input {
+  .search-input,
+  .filter-select {
     max-width: 100%;
   }
 

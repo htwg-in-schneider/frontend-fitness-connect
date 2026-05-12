@@ -10,21 +10,26 @@ const router = useRouter()
 const orteStore = useOrteStore()
 
 const eingabe = ref(route.query.suche ?? '')
+const art = ref(route.query.art ?? '')
 
-async function suchen() {
+function suchen() {
   const q = eingabe.value.trim()
-  router.replace({ path: '/orte', query: q ? { suche: q } : {} })
+  const a = art.value
+  const query = {}
+  if (q) query.suche = q
+  if (a) query.art = a
+  router.replace({ path: '/orte', query })
 }
 
 onMounted(async () => {
-  const q = route.query.suche ?? ''
-  eingabe.value = q
-  await orteStore.search(q)
+  await orteStore.fetchArten()
+  await orteStore.search({ suche: eingabe.value, art: art.value })
 })
 
-watch(() => route.query.suche, async (val) => {
-  eingabe.value = val ?? ''
-  await orteStore.search(val ?? '')
+watch(() => route.query, async (q) => {
+  eingabe.value = q.suche ?? ''
+  art.value = q.art ?? ''
+  await orteStore.search({ suche: eingabe.value, art: art.value })
 })
 </script>
 
@@ -44,6 +49,10 @@ watch(() => route.query.suche, async (val) => {
             placeholder="Sportanlage finden…"
             @keyup.enter="suchen"
           />
+          <select v-model="art" class="filter-select">
+            <option value="">Alle Arten</option>
+            <option v-for="a in orteStore.arten" :key="a" :value="a">{{ a }}</option>
+          </select>
           <Button @click="suchen">Suchen</Button>
         </div>
       </div>
@@ -109,6 +118,21 @@ watch(() => route.query.suche, async (val) => {
   background: #fff;
 }
 
+.filter-select {
+  padding: 10px 12px;
+  border: 1px solid #CBD5E1;
+  border-radius: 8px;
+  font-size: 14px;
+  background: #F8FAFC;
+  outline: none;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  border-color: #3B82F6;
+  background: #fff;
+}
+
 .orte-grid {
   display: flex;
   flex-wrap: wrap;
@@ -170,7 +194,8 @@ watch(() => route.query.suche, async (val) => {
     align-items: stretch;
   }
 
-  .search-input {
+  .search-input,
+  .filter-select {
     max-width: 100%;
   }
 

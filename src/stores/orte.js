@@ -24,7 +24,7 @@ export const useOrteStore = defineStore('orte', {
       const qs = params.toString()
       const res = await fetch(`${API}/api/orte${qs ? '?' + qs : ''}`)
       const data = await res.json()
-      this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl }))
+      this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl, art: o.art ? o.art.charAt(0).toUpperCase() + o.art.slice(1).toLowerCase() : o.art }))
     },
   },
 })

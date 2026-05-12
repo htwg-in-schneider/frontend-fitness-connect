@@ -2,7 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEventsStore } from '../stores/events.js'
-import { formatEventDate, trainerDisplayName } from '../data.js'
+import { formatEventDate } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
@@ -71,15 +71,10 @@ function renderStars(rating) {
 
           <!-- Rechte Spalte: Trainer + Preis -->
           <div class="col-right">
-            <div v-if="event.trainer" class="detail-card trainer-card">
-              <img :src="event.trainer.profilbild_pfad" :alt="trainerDisplayName(event.trainer)" class="trainer-avatar" />
+            <div v-if="event.trainerName" class="detail-card trainer-card">
               <div class="trainer-info">
-                <p class="trainer-name">{{ trainerDisplayName(event.trainer) }}</p>
-                <p class="trainer-sport">{{ event.trainer.trainerart }}</p>
-                <p class="trainer-rating">{{ renderStars(event.trainer.bewertung) }} <span class="rating-num">{{ event.trainer.bewertung }}</span></p>
-              </div>
-              <div class="trainer-btn-wrap">
-                <Button @click="router.push('/trainer/' + event.trainer.id)">Jetzt ansehen</Button>
+                <p class="trainer-label">👤 Trainer</p>
+                <p class="trainer-name">{{ event.trainerName }}</p>
               </div>
             </div>
 

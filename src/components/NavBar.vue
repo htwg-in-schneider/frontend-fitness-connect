@@ -17,7 +17,7 @@ const route = useRoute()
         <hr class="topnav-divider">
         <ul class="topnav-nav">
             <li @click="router.push('/')"><NavButton emoji="📊" label="Dashboard" :active="route.path === '/'"/></li>
-            <li><NavButton emoji="📅" label="Events / Kurse" /></li>
+            <li @click="router.push('/events')"><NavButton emoji="📅" label="Events / Kurse" :active="route.path === '/events'" /></li>
             <li @click="router.push('/orte')"><NavButton emoji="🏟️" label="Sportanlagen" :active="route.path === '/orte'" /></li>
             <li><NavButton emoji="👥" label="Trainer" /></li>
             <li><NavButton emoji="👤" label="Mein Profil" /></li>

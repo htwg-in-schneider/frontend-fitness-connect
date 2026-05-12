@@ -14,7 +14,6 @@ export const useOrteStore = defineStore('orte', {
       const url = query ? `${base}?suche=${encodeURIComponent(query)}` : base
       const res = await fetch(url)
       const data = await res.json()
-      console.log('Fetched Orte:', data)
       this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl }))
     },
   },

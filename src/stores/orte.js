@@ -7,8 +7,14 @@ export const useOrteStore = defineStore('orte', {
   actions: {
     async fetchAll() {
       if (this.list.length) return
-      const res = await fetch('http://localhost:8081/api/orte')
+      await this.search('')
+    },
+    async search(query) {
+      const base = 'http://localhost:8081/api/orte'
+      const url = query ? `${base}?suche=${encodeURIComponent(query)}` : base
+      const res = await fetch(url)
       const data = await res.json()
+      console.log('Fetched Orte:', data)
       this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl }))
     },
   },

@@ -3,9 +3,11 @@ import Dashboard from '../views/Dashboard.vue'
 import EventDetail from '../views/EventDetail.vue'
 import TrainerDetail from '../views/TrainerDetail.vue'
 import OrtDetail from '../views/OrtDetail.vue'
+import SportanlagenView from '../views/SportanlagenView.vue'
 
 const routes = [
   { path: '/', component: Dashboard },
+  { path: '/orte', component: SportanlagenView },
   { path: '/event/:id', component: EventDetail },
   { path: '/trainer/:id', component: TrainerDetail },
   { path: '/ort/:id', component: OrtDetail },

@@ -1,9 +1,12 @@
 <script setup>
+import { useRouter, useRoute } from 'vue-router'
 import logoLight from '../assets/logos/LogoFitnessConnectLight.png'
 import NavButton from './NavButton.vue'
 import { useBannerStore } from '../stores/banner.js'
 
 const bannerStore = useBannerStore()
+const router = useRouter()
+const route = useRoute()
 </script>
 
 <template>
@@ -13,9 +16,9 @@ const bannerStore = useBannerStore()
         </div>
         <hr class="topnav-divider">
         <ul class="topnav-nav">
-            <li><NavButton emoji="📊" label="Dashboard" :active="true" /></li>
+            <li @click="router.push('/')"><NavButton emoji="📊" label="Dashboard" :active="route.path === '/'"/></li>
             <li><NavButton emoji="📅" label="Events / Kurse" /></li>
-            <li><NavButton emoji="🏟️" label="Sportanlagen" /></li>
+            <li @click="router.push('/orte')"><NavButton emoji="🏟️" label="Sportanlagen" :active="route.path === '/orte'" /></li>
             <li><NavButton emoji="👥" label="Trainer" /></li>
             <li><NavButton emoji="👤" label="Mein Profil" /></li>
         </ul>

@@ -1,5 +1,6 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import logoLight from '../assets/logos/LogoFitnessConnectLight.png'
 import NavButton from './NavButton.vue'
 import { useBannerStore } from '../stores/banner.js'
@@ -7,6 +8,7 @@ import { useBannerStore } from '../stores/banner.js'
 const bannerStore = useBannerStore()
 const router = useRouter()
 const route = useRoute()
+const { isAuthenticated, loginWithRedirect, logout } = useAuth0()
 </script>
 
 <template>
@@ -22,6 +24,15 @@ const route = useRoute()
             <li><NavButton emoji="👥" label="Trainer" /></li>
             <li><NavButton emoji="👤" label="Mein Profil" /></li>
         </ul>
+        <div class="topnav-auth">
+            <template v-if="!isAuthenticated">
+                <button class="auth-btn" @click="loginWithRedirect()">Anmelden</button>
+                <button class="auth-btn auth-btn--primary" @click="loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })">Registrieren</button>
+            </template>
+            <template v-else>
+                <button class="auth-btn" @click="logout({ logoutParams: { returnTo: window.location.origin } })">Abmelden</button>
+            </template>
+        </div>
     </nav>
 </template>
 
@@ -67,5 +78,39 @@ const route = useRoute()
     flex-direction: row;
     flex-wrap: nowrap;
     gap: 2px;
+    flex: 1;
+}
+
+.topnav-auth {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+    flex-shrink: 0;
+}
+
+.auth-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.auth-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.auth-btn--primary {
+    background: #3B82F6;
+    border-color: #3B82F6;
+}
+
+.auth-btn--primary:hover {
+    background: #2563EB;
+    border-color: #2563EB;
 }
 </style>

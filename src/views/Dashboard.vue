@@ -1,5 +1,6 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { useTrainerStore } from '../stores/trainer.js'
 import { useOrteStore } from '../stores/orte.js'
 import { useEventsStore } from '../stores/events.js'
@@ -8,6 +9,9 @@ import HeroSection from '../components/HeroSection.vue'
 import EventsSection from '../components/EventsSection.vue'
 import OrteSection from '../components/OrteSection.vue'
 import TrainerSection from '../components/TrainerSection.vue'
+
+const { loginWithRedirect } = useAuth0()
+const email = ref('')
 
 const trainerStore = useTrainerStore()
 const orteStore = useOrteStore()
@@ -38,6 +42,8 @@ onMounted(() => {
                 <button class="profile-icon">👤</button>
             </div>
         </header>
+
+
 
         <HeroSection />
         <p v-if="eventsStore.error" class="fetch-error">⚠️ {{ eventsStore.error }}</p>

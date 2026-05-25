@@ -1,6 +1,10 @@
 <script setup>
+import { useAuth0 } from '@auth0/auth0-vue'
 import Button from './Button.vue'
-import NavigationLink from './NavigationLink.vue';
+import NavigationLink from './NavigationLink.vue'
+
+const { loginWithRedirect } = useAuth0()
+const email = defineModel('email', { default: '' })
 </script>
 
 <template>
@@ -12,10 +16,10 @@ import NavigationLink from './NavigationLink.vue';
             </div>
             <div class="hero-divider"></div>
             <div class="login-form">
-                <h3 class="login-title">Jetzt Restrieren:</h3>
-                <input class="login-input" type="text" placeholder="E-Mail">
-                <Button>Registrieren</Button>
-                <NavigationLink>Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
+                <h3 class="login-title">Jetzt Registrieren:</h3>
+                <input class="login-input" type="text" placeholder="E-Mail" v-model="email">
+                <Button @click="loginWithRedirect({ authorizationParams: { screen_hint: 'signup', login_hint: email } })">Registrieren</Button>
+                <NavigationLink @click="loginWithRedirect()">Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
             </div>
         </div>
     </section>

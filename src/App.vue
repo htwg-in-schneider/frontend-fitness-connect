@@ -1,9 +1,28 @@
 <script setup>
-import { watchEffect } from 'vue'
+import { watch, watchEffect } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import SpecialBanner from './components/SpecialBanner.vue'
 import { useBannerStore } from './stores/banner.js'
 
 const bannerStore = useBannerStore()
+const router = useRouter()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
+
+watch(isAuthenticated, async (authenticated) => {
+  if (!authenticated) return
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch('http://localhost:8081/api/nutzer/me', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (res.status === 404) {
+      router.push('/complete-profile')
+    }
+  } catch (e) {
+    // ignore – user can retry later
+  }
+})
 
 watchEffect(() => {
   document.body.style.marginTop = bannerStore.isVisible ? '100px' : '60px'

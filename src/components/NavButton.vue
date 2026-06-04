@@ -1,6 +1,10 @@
 <script setup>
-defineProps({
-    emoji: {
+import { LayoutDashboard, Calendar, MapPin, Users, User } from 'lucide-vue-next'
+
+const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User }
+
+const props = defineProps({
+    icon: {
         type: String,
         required: true,
     },
@@ -17,7 +21,7 @@ defineProps({
 
 <template>
     <button type="button" class="nav-btn" :class="{ active }">
-        <span class="nav-btn-emoji">{{ emoji }}</span> <span class="nav-btn-label"> {{ label }}</span>
+        <component :is="iconMap[icon]" :size="16" class="nav-btn-icon" /> <span class="nav-btn-label"> {{ label }}</span>
     </button>
 </template>
 
@@ -44,6 +48,11 @@ defineProps({
     background: #C00000;
     color: #FFFFFF;
     font-weight: bold;
+}
+
+.nav-btn-icon {
+    vertical-align: -3px;
+    margin-right: 2px;
 }
 
 @media (max-width: 768px) {

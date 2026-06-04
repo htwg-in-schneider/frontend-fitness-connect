@@ -9,15 +9,35 @@ const vorname = ref('')
 const nachname = ref('')
 const email = ref('')
 const profilFarbe = ref('#EF4444')
+const rolle = ref('USER')
 const loading = ref(true)
 const saving = ref(false)
+const savingTrainer = ref(false)
 const error = ref('')
 const success = ref('')
+
+// Trainer fields
+const trainerart = ref('')
+const kontoinhaber = ref('')
+const iban = ref('')
+const bic = ref('')
+const telefonnummer = ref('')
+const zitat = ref('')
+const profilbildUrl = ref('')
+
+const isTrainer = computed(() => rolle.value === 'TRAINER')
 
 const farben = [
   '#EF4444', '#F97316', '#F59E0B', '#10B981',
   '#14B8A6', '#3B82F6', '#6366F1', '#8B5CF6',
   '#EC4899', '#64748B', '#06B6D4', '#84CC16',
+]
+
+const profilbilder = [
+  'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/IlyasK.png',
+  'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/LisaM.png',
+  'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/MaxS.png',
+  'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/AlidaW.png',
 ]
 
 const initialen = computed(() => {
@@ -39,6 +59,21 @@ async function loadProfile() {
       nachname.value = data.nachname
       email.value = data.email
       profilFarbe.value = data.profilFarbe || '#EF4444'
+      rolle.value = data.rolle
+    }
+    // Load trainer data if trainer
+    const trainerRes = await fetch('http://localhost:8081/api/nutzer/me/trainer', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (trainerRes.ok) {
+      const td = await trainerRes.json()
+      trainerart.value = td.trainerart || ''
+      kontoinhaber.value = td.kontoinhaber || ''
+      iban.value = td.iban || ''
+      bic.value = td.bic || ''
+      telefonnummer.value = td.telefonnummer || ''
+      zitat.value = td.zitat || ''
+      profilbildUrl.value = td.profilbildUrl || ''
     }
   } catch (e) {
     error.value = 'Profil konnte nicht geladen werden.'
@@ -78,6 +113,40 @@ async function saveProfile() {
   }
 }
 
+async function saveTrainerProfile() {
+  error.value = ''
+  success.value = ''
+  savingTrainer.value = true
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch('http://localhost:8081/api/nutzer/me/trainer', {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        trainerart: trainerart.value,
+        kontoinhaber: kontoinhaber.value,
+        iban: iban.value,
+        bic: bic.value,
+        telefonnummer: telefonnummer.value,
+        zitat: zitat.value,
+        profilbildUrl: profilbildUrl.value,
+      }),
+    })
+    if (res.ok) {
+      success.value = 'Trainerprofil erfolgreich gespeichert.'
+    } else {
+      error.value = 'Fehler beim Speichern.'
+    }
+  } catch (e) {
+    error.value = 'Ein Fehler ist aufgetreten.'
+  } finally {
+    savingTrainer.value = false
+  }
+}
+
 onMounted(loadProfile)
 </script>
 
@@ -88,11 +157,12 @@ onMounted(loadProfile)
 
       <!-- Hero Card like TrainerDetail -->
       <div class="profile-hero-card">
-        <div class="avatar" :style="{ background: profilFarbe + '25', borderColor: profilFarbe }">
+        <img v-if="isTrainer && profilbildUrl" class="trainer-avatar" :src="profilbildUrl" alt="Profilbild" />
+        <div v-else class="avatar" :style="{ background: profilFarbe + '25', borderColor: profilFarbe }">
           <span class="avatar-initials" :style="{ color: profilFarbe }">{{ initialen }}</span>
         </div>
         <div class="profile-hero-info">
-          <p class="profile-sport">Persönliches Profil</p>
+          <p class="profile-sport">{{ isTrainer ? 'Trainer · ' + trainerart : 'Persönliches Profil' }}</p>
           <h1 class="profile-name">{{ vorname }} {{ nachname }}</h1>
           <p class="profile-email">{{ email }}</p>
         </div>
@@ -137,6 +207,57 @@ onMounted(loadProfile)
 
           <button type="submit" class="btn-default save-btn" :disabled="saving">
             {{ saving ? 'Wird gespeichert…' : 'Änderungen speichern' }}
+          </button>
+        </form>
+        <div v-if="!isTrainer" class="trainer-link">
+          <a href="#" @click.prevent="$router.push('/become-trainer')">Als Trainer registrieren →</a>
+        </div>
+      </div>
+
+      <!-- Trainer Card -->
+      <div v-if="isTrainer" class="detail-card">
+        <h2 class="detail-section-title">Trainerprofil bearbeiten</h2>
+        <form @submit.prevent="saveTrainerProfile" class="profile-form">
+          <label>
+            <span class="field-label">Trainerart</span>
+            <input v-model="trainerart" type="text" required placeholder="z. B. Fitness, Yoga, Fußball" />
+          </label>
+          <label>
+            <span class="field-label">Kontoinhaber</span>
+            <input v-model="kontoinhaber" type="text" required placeholder="Kontoinhaber" />
+          </label>
+          <label>
+            <span class="field-label">IBAN</span>
+            <input v-model="iban" type="text" required placeholder="DE..." />
+          </label>
+          <label>
+            <span class="field-label">BIC</span>
+            <input v-model="bic" type="text" required placeholder="BIC" />
+          </label>
+          <label>
+            <span class="field-label">Telefonnummer</span>
+            <input v-model="telefonnummer" type="tel" required placeholder="+49..." />
+          </label>
+          <label>
+            <span class="field-label">Persönliches Zitat</span>
+            <textarea v-model="zitat" rows="3" placeholder="Ein persönliches Zitat…"></textarea>
+          </label>
+          <div class="image-selection">
+            <span class="field-label">Profilbild</span>
+            <div class="image-grid">
+              <div
+                v-for="bild in profilbilder"
+                :key="bild"
+                class="image-option"
+                :class="{ selected: profilbildUrl === bild }"
+                @click="profilbildUrl = bild"
+              >
+                <img :src="bild" alt="Profilbild" />
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn-default save-btn" :disabled="savingTrainer">
+            {{ savingTrainer ? 'Wird gespeichert…' : 'Trainerprofil speichern' }}
           </button>
         </form>
       </div>
@@ -326,5 +447,83 @@ onMounted(loadProfile)
 
 .success-msg {
   color: #10B981;
+}
+
+.trainer-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.profile-form textarea {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #E2E8F0;
+  background: #F8FAFC;
+  color: #1E293B;
+  font-size: 14px;
+  font-family: "Arial", sans-serif;
+  resize: vertical;
+}
+
+.profile-form textarea:focus {
+  outline: none;
+  border-color: #C00000;
+}
+
+.image-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.image-option {
+  border-radius: 12px;
+  border: 3px solid transparent;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.image-option img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.image-option.selected {
+  border-color: #C00000;
+}
+
+.image-option:hover:not(.selected) {
+  border-color: #E2E8F0;
+}
+
+.trainer-link {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #E2E8F0;
+  text-align: center;
+}
+
+.trainer-link a {
+  color: #C00000;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Arial", sans-serif;
+  text-decoration: none;
+}
+
+.trainer-link a:hover {
+  text-decoration: underline;
 }
 </style>

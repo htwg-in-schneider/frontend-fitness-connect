@@ -5,6 +5,12 @@
     box-sizing: border-box;
 }
 
+/* Lucide icons inline alignment */
+svg.lucide {
+    display: inline-block;
+    vertical-align: -2px;
+}
+
 body {
     background: #FFFFFF;
     color: #1E293B;

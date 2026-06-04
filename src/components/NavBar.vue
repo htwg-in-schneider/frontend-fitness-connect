@@ -22,11 +22,11 @@ function handleLogout() {
         </div>
         <hr class="topnav-divider">
         <ul class="topnav-nav">
-            <li @click="router.push('/')"><NavButton emoji="📊" label="Dashboard" :active="route.path === '/'"/></li>
-            <li @click="router.push('/events')"><NavButton emoji="📅" label="Events / Kurse" :active="route.path === '/events'" /></li>
-            <li @click="router.push('/orte')"><NavButton emoji="🏟️" label="Sportanlagen" :active="route.path === '/orte'" /></li>
-            <li><NavButton emoji="👥" label="Trainer" /></li>
-            <li v-if="isAuthenticated" @click="router.push('/profil')"><NavButton emoji="👤" label="Mein Profil" :active="route.path === '/profil'" /></li>
+            <li @click="router.push('/')"><NavButton icon="LayoutDashboard" label="Dashboard" :active="route.path === '/'"/></li>
+            <li @click="router.push('/events')"><NavButton icon="Calendar" label="Events / Kurse" :active="route.path === '/events'" /></li>
+            <li @click="router.push('/orte')"><NavButton icon="MapPin" label="Sportanlagen" :active="route.path === '/orte'" /></li>
+            <li @click="router.push('/trainer')"><NavButton icon="Users" label="Trainer" :active="route.path === '/trainer'" /></li>
+            <li v-if="isAuthenticated" @click="router.push('/profil')"><NavButton icon="User" label="Mein Profil" :active="route.path === '/profil'" /></li>
         </ul>
         <div class="topnav-auth">
             <template v-if="!isAuthenticated">

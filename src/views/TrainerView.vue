@@ -1,22 +1,18 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useOrteStore } from '../stores/orte.js'
+import { useTrainerStore } from '../stores/trainer.js'
+import { trainerDisplayName } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
-import { MapPin, Tag, Building } from 'lucide-vue-next'
+import { Users, Star } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
-const orteStore = useOrteStore()
+const trainerStore = useTrainerStore()
 
 const eingabe = ref(route.query.suche ?? '')
 const art = ref(route.query.art ?? '')
-
-function toFirstUppercase(value) {
-  if (!value || typeof value !== 'string') return value
-  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
-}
 
 function suchen() {
   const q = eingabe.value.trim()
@@ -24,18 +20,18 @@ function suchen() {
   const query = {}
   if (q) query.suche = q
   if (a) query.art = a
-  router.replace({ path: '/orte', query })
+  router.replace({ path: '/trainer', query })
 }
 
 onMounted(async () => {
-  await orteStore.fetchArten()
-  await orteStore.search({ suche: eingabe.value, art: art.value })
+  await trainerStore.fetchArten()
+  await trainerStore.search({ suche: eingabe.value, art: art.value })
 })
 
 watch(() => route.query, async (q) => {
   eingabe.value = q.suche ?? ''
   art.value = q.art ?? ''
-  await orteStore.search({ suche: eingabe.value, art: art.value })
+  await trainerStore.search({ suche: eingabe.value, art: art.value })
 })
 </script>
 
@@ -43,38 +39,38 @@ watch(() => route.query, async (q) => {
   <NavBar />
 
   <main class="main-content">
-    <div class="sportanlagen-page">
+    <div class="trainer-page">
 
       <div class="search-header">
-        <h1 class="page-title"><Building :size="20" /> Sportanlagen</h1>
+        <h1 class="page-title"><Users :size="20" /> Trainer</h1>
         <div class="search-row">
           <input
             v-model="eingabe"
             class="search-input"
             type="search"
-            placeholder="Sportanlage finden…"
+            placeholder="Trainer suchen…"
             @keyup.enter="suchen"
           />
           <select v-model="art" class="filter-select">
-            <option value="">Alle Arten</option>
-            <option v-for="a in orteStore.arten" :key="a" :value="a">{{ toFirstUppercase(a) }}</option>
+            <option value="">Alle Trainerarten</option>
+            <option v-for="a in trainerStore.arten" :key="a" :value="a">{{ a }}</option>
           </select>
           <Button @click="suchen">Suchen</Button>
         </div>
       </div>
 
-      <div v-if="orteStore.list.length === 0" class="keine-ergebnisse">
-        Keine Sportanlagen gefunden.
+      <div v-if="trainerStore.list.length === 0" class="keine-ergebnisse">
+        Keine Trainer gefunden.
       </div>
 
-      <div class="orte-grid">
-        <div class="ort-card" v-for="ort in orteStore.list" :key="ort.id">
-          <img :src="ort.bild_pfad" :alt="ort.name" class="ort-image">
-          <div class="ort-card-body">
-            <h3 class="ort-title">{{ ort.name }}</h3>
-            <p class="ort-address"><MapPin :size="13" /> {{ ort.adresse }}</p>
-            <p class="ort-art"><Tag :size="13" /> {{ ort.art }}</p>
-            <Button @click="$router.push('/ort/' + ort.id)">Ansehen</Button>
+      <div class="trainer-grid">
+        <div class="trainer-card" v-for="t in trainerStore.list" :key="t.id">
+          <img :src="t.profilbild_pfad" :alt="trainerDisplayName(t)" class="trainer-image">
+          <div class="trainer-card-body">
+            <h3 class="trainer-name">{{ trainerDisplayName(t) }}</h3>
+            <p class="trainer-art">{{ t.trainerart }}</p>
+            <p class="trainer-rating"><Star :size="13" /> {{ t.bewertung }}</p>
+            <Button @click="$router.push('/trainer/' + t.id)">Profil ansehen</Button>
           </div>
         </div>
       </div>
@@ -84,7 +80,7 @@ watch(() => route.query, async (q) => {
 </template>
 
 <style scoped>
-.sportanlagen-page {
+.trainer-page {
   padding: 32px 24px;
   max-width: 1100px;
   margin: 0 auto;
@@ -100,6 +96,9 @@ watch(() => route.query, async (q) => {
   font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
   color: #1E293B;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .search-row {
@@ -139,13 +138,20 @@ watch(() => route.query, async (q) => {
   background: #fff;
 }
 
-.orte-grid {
+.keine-ergebnisse {
+  text-align: center;
+  color: #94A3B8;
+  padding: 40px 0;
+  font-size: 14px;
+}
+
+.trainer-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
 }
 
-.ort-card {
+.trainer-card {
   flex: 1 1 280px;
   max-width: 360px;
   background: #fff;
@@ -155,62 +161,45 @@ watch(() => route.query, async (q) => {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.ort-card:hover {
+.trainer-card:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
 }
 
-.ort-image {
+.trainer-image {
   width: 100%;
-  height: 180px;
+  height: 200px;
   object-fit: cover;
   display: block;
 }
 
-.ort-card-body {
+.trainer-card-body {
   padding: 14px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
 
-.ort-title {
+.trainer-name {
   font-size: 15px;
   font-weight: bold;
   font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
   color: #1E293B;
+  margin: 0;
 }
 
-.ort-address,
-.ort-art {
-  font-size: 12px;
+.trainer-art {
+  font-size: 13px;
   color: #64748B;
-  font-family: "Arial", sans-serif;
+  margin: 0;
 }
 
-.keine-ergebnisse {
-  color: #64748B;
-  font-size: 14px;
-  padding: 24px 0;
-}
-
-@media (max-width: 600px) {
-  .search-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-input,
-  .filter-select {
-    max-width: 100%;
-  }
-
-  .orte-grid {
-    flex-direction: column;
-  }
-
-  .ort-card {
-    max-width: 100%;
-  }
+.trainer-rating {
+  font-size: 13px;
+  color: #F59E0B;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
 }
 </style>

@@ -5,6 +5,7 @@ import { useEventsStore } from '../stores/events.js'
 import { formatEventDate } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
+import { Calendar, MapPin, Tag, User } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -41,7 +42,7 @@ watch(() => route.query, async (q) => {
     <div class="events-page">
 
       <div class="search-header">
-        <h1 class="page-title">📅 Events &amp; Kurse</h1>
+        <h1 class="page-title"><Calendar :size="20" /> Events &amp; Kurse</h1>
         <div class="search-row">
           <input
             v-model="eingabe"
@@ -76,10 +77,10 @@ watch(() => route.query, async (q) => {
           </div>
           <div class="event-card-body">
             <h3 class="event-title">{{ event.name }}</h3>
-            <p class="event-detail">🏷️ {{ event.sportart }}</p>
-            <p class="event-detail">📍 {{ event.ort?.name }}</p>
-            <p class="event-detail">📅 {{ formatEventDate(event.date) }}</p>
-            <p v-if="event.trainerName" class="event-detail">👤 {{ event.trainerName }}</p>
+            <p class="event-detail"><Tag :size="13" /> {{ event.sportart }}</p>
+            <p class="event-detail"><MapPin :size="13" /> {{ event.ort?.name }}</p>
+            <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
+            <p v-if="event.trainerName" class="event-detail"><User :size="13" /> {{ event.trainerName }}</p>
             <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
             <Button @click="router.push('/event/' + event.id)">
               {{ event.preis ? 'Kurs ansehen' : 'Teilnehmen' }}

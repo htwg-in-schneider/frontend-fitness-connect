@@ -21,6 +21,7 @@ const eventsStore = useEventsStore()
 const vorname = ref('')
 const nachname = ref('')
 const profilFarbe = ref('#EF4444')
+const trainerProfilbild = ref('')
 
 const initialen = computed(() => {
   const v = vorname.value?.trim()
@@ -39,6 +40,13 @@ async function loadProfile() {
       vorname.value = data.vorname
       nachname.value = data.nachname
       profilFarbe.value = data.profilFarbe || '#EF4444'
+    }
+    const trainerRes = await fetch('http://localhost:8081/api/nutzer/me/trainer', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (trainerRes.ok) {
+      const td = await trainerRes.json()
+      trainerProfilbild.value = td.profilbildUrl || ''
     }
   } catch (e) { /* ignore */ }
 }
@@ -62,7 +70,7 @@ watch(isAuthenticated, (authenticated) => {
         <header class="content-header">
             <div class="header-mid">
                 <div class="welcome-container">
-                    <h1 class="welcome-title">Willkommen! 👋</h1>
+                    <h1 class="welcome-title">Willkommen!</h1>
                     <p class="welcome-subtitle">Finde dein nächstes Training in Konstanz</p>
                 </div>
             </div>
@@ -70,7 +78,10 @@ watch(isAuthenticated, (authenticated) => {
                 <div class="search-bar">
                     <input type="text" placeholder="Nach Sportart suchen…">
                 </div>
-                <button v-if="isAuthenticated" class="profile-avatar" @click="router.push('/profil')" :style="{ background: profilFarbe + '33', borderColor: profilFarbe }">
+                <button v-if="isAuthenticated && trainerProfilbild" class="profile-avatar trainer-img-btn" @click="router.push('/profil')">
+                    <img :src="trainerProfilbild" alt="Profil" class="trainer-img" />
+                </button>
+                <button v-else-if="isAuthenticated" class="profile-avatar" @click="router.push('/profil')" :style="{ background: profilFarbe + '33', borderColor: profilFarbe }">
                     <span :style="{ color: profilFarbe }">{{ initialen }}</span>
                 </button>
             </div>
@@ -113,6 +124,20 @@ watch(isAuthenticated, (authenticated) => {
 
 .profile-avatar:hover {
     transform: scale(1.1);
+}
+
+.trainer-img-btn {
+    border: none;
+    background: none;
+    padding: 0;
+    overflow: hidden;
+}
+
+.trainer-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
 }
 </style>
 

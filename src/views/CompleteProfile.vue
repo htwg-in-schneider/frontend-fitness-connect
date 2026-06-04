@@ -71,6 +71,9 @@ async function submit() {
           {{ loading ? 'Wird gespeichert…' : 'Speichern' }}
         </button>
       </form>
+      <div class="trainer-link">
+        <a href="#" @click.prevent="router.push('/become-trainer')">Als Trainer registrieren →</a>
+      </div>
     </div>
   </div>
 </template>
@@ -158,5 +161,24 @@ async function submit() {
   color: #EF4444;
   margin: 0;
   font-size: 13px;
+}
+
+.trainer-link {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #E2E8F0;
+  text-align: center;
+}
+
+.trainer-link a {
+  color: #C00000;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Arial", sans-serif;
+  text-decoration: none;
+}
+
+.trainer-link a:hover {
+  text-decoration: underline;
 }
 </style>

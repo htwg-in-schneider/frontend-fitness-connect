@@ -6,6 +6,7 @@ import { formatEventDate } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
+import { MapPin, Calendar, Armchair, User } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,15 +56,15 @@ function renderStars(rating) {
             <br>
             <ul class="info-list">
               <li>
-                <span class="info-label">📍 Ort</span>
+                <span class="info-label"><MapPin :size="14" /> Ort</span>
                 <span class="info-value">{{ event.ort.adresse }}</span>
               </li>
               <li>
-                <span class="info-label">📅 Datum</span>
+                <span class="info-label"><Calendar :size="14" /> Datum</span>
                 <span class="info-value">{{ formatEventDate(event.date) }}</span>
               </li>
               <li>
-                <span class="info-label">🪑 Plätze</span>
+                <span class="info-label"><Armchair :size="14" /> Plätze</span>
                 <span class="info-value">{{ event.freiePlaetze }} / {{ event.anzahlPlaetze }} frei</span>
               </li>
             </ul>
@@ -73,7 +74,7 @@ function renderStars(rating) {
           <div class="col-right">
             <div v-if="event.trainerName" class="detail-card trainer-card">
               <div class="trainer-info">
-                <p class="trainer-label">👤 Trainer</p>
+                <p class="trainer-label"><User :size="14" /> Trainer</p>
                 <p class="trainer-name">{{ event.trainerName }}</p>
               </div>
             </div>
@@ -109,15 +110,15 @@ function renderStars(rating) {
             <h2 class="detail-section-title section-title-gap">Event-Details</h2>
             <ul class="info-list">
               <li>
-                <span class="info-label">📍 Ort</span>
+                <span class="info-label"><MapPin :size="14" /> Ort</span>
                 <span class="info-value">{{ event.ort.adresse }}</span>
               </li>
               <li>
-                <span class="info-label">📅 Datum</span>
+                <span class="info-label"><Calendar :size="14" /> Datum</span>
                 <span class="info-value">{{ formatEventDate(event.date) }}</span>
               </li>
               <li>
-                <span class="info-label">🪑 Plätze</span>
+                <span class="info-label"><Armchair :size="14" /> Plätze</span>
                 <span class="info-value">{{ event.freiePlaetze }} / {{ event.anzahlPlaetze }} frei</span>
               </li>
             </ul>

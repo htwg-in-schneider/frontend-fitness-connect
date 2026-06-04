@@ -7,6 +7,7 @@ import { trainerDisplayName } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
+import { Phone, Dumbbell } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -68,11 +69,11 @@ function renderStars(rating) {
           <h2 class="detail-section-title">Kontakt</h2>
           <ul class="info-list">
             <li>
-              <span class="info-label">📞 Telefon</span>
+              <span class="info-label"><Phone :size="14" /> Telefon</span>
               <span class="info-value">{{ t.telefonnummer }}</span>
             </li>
             <li>
-              <span class="info-label">🏋️ Disziplin</span>
+              <span class="info-label"><Dumbbell :size="14" /> Disziplin</span>
               <span class="info-value">{{ t.trainerart }}</span>
             </li>
           </ul>

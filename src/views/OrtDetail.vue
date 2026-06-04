@@ -6,6 +6,7 @@ import { useEventsStore } from '../stores/events.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
+import { MapPin, Tag } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,11 +84,11 @@ const mapsFullUrl = computed(() => {
         <h2 class="detail-section-title">Standort-Details</h2>
         <ul class="info-list">
           <li>
-            <span class="info-label">🏷️ Art</span>
+            <span class="info-label"><Tag :size="14" /> Art</span>
             <span class="info-value">{{ ort.art }}</span>
           </li>
           <li>
-            <span class="info-label">📍 Adresse</span>
+            <span class="info-label"><MapPin :size="14" /> Adresse</span>
             <span class="info-value">{{ ort.adresse }}</span>
           </li>
         </ul>

@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { formatEventDate } from '../data.js'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
+import { MapPin, Calendar } from 'lucide-vue-next'
 
 const router = useRouter()
 
@@ -30,8 +31,8 @@ defineProps({
                 </div>
                 <div class="event-card-body">
                     <h3 class="event-title">{{ event.name }}</h3>
-                    <p class="event-detail">📍 {{ event.ort.name }}</p>
-                    <p class="event-detail">📅 {{ formatEventDate(event.date) }}</p>
+                    <p class="event-detail"><MapPin :size="13" /> {{ event.ort.name }}</p>
+                    <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
                     <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
                     <Button @click="router.push('/event/' + event.id)">Teilnehmen</Button>
                 </div>

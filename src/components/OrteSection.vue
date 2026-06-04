@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
+import { MapPin } from 'lucide-vue-next'
 
 const router = useRouter()
 
@@ -24,7 +25,7 @@ defineProps({
                 <img :src="ort.bild_pfad" :alt="ort.name" class="ort-image">
                 <div class="ort-card-body">
                     <h3 class="ort-title">{{ ort.name }}</h3>
-                    <p class="ort-address">📍 {{ ort.adresse }}</p>
+                    <p class="ort-address"><MapPin :size="13" /> {{ ort.adresse }}</p>
                     <Button @click="router.push('/ort/' + ort.id)">Ansehen</Button>
                 </div>
             </div>

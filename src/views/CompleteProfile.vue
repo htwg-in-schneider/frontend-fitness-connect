@@ -49,48 +49,59 @@ async function submit() {
 </script>
 
 <template>
-  <div class="complete-profile">
-    <h1>Profil vervollständigen</h1>
-    <p>Bitte gib noch ein paar Daten ein, um dein Konto einzurichten.</p>
-    <form @submit.prevent="submit" class="profile-form">
-      <label>
-        E-Mail
-        <input v-model="email" type="email" required placeholder="E-Mail-Adresse" disabled />
-      </label>
-      <label>
-        Vorname
-        <input v-model="vorname" type="text" required placeholder="Vorname" />
-      </label>
-      <label>
-        Nachname
-        <input v-model="nachname" type="text" required placeholder="Nachname" />
-      </label>
-      <p v-if="error" class="error">{{ error }}</p>
-      <button type="submit" :disabled="loading">
-        {{ loading ? 'Wird gespeichert…' : 'Speichern' }}
-      </button>
-    </form>
+  <div class="complete-profile-wrapper">
+    <div class="detail-card">
+      <h2 class="detail-section-title">Profil vervollständigen</h2>
+      <p class="hint">Bitte gib noch ein paar Daten ein, um dein Konto einzurichten.</p>
+      <form @submit.prevent="submit" class="profile-form">
+        <label>
+          <span class="field-label">E-Mail</span>
+          <input v-model="email" type="email" required placeholder="E-Mail-Adresse" disabled />
+        </label>
+        <label>
+          <span class="field-label">Vorname</span>
+          <input v-model="vorname" type="text" required placeholder="Vorname" />
+        </label>
+        <label>
+          <span class="field-label">Nachname</span>
+          <input v-model="nachname" type="text" required placeholder="Nachname" />
+        </label>
+        <p v-if="error" class="error">{{ error }}</p>
+        <button type="submit" class="btn-default save-btn" :disabled="loading">
+          {{ loading ? 'Wird gespeichert…' : 'Speichern' }}
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.complete-profile {
-  max-width: 400px;
-  margin: 80px auto;
-  padding: 32px;
-  background: #1E293B;
-  border-radius: 12px;
-  color: #fff;
+.complete-profile-wrapper {
+  max-width: 440px;
+  margin: 100px auto;
+  padding: 0 16px;
 }
 
-h1 {
-  margin-bottom: 8px;
-  font-size: 1.5rem;
+.detail-card {
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 28px 28px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
-p {
-  margin-bottom: 24px;
-  color: #94A3B8;
+.detail-section-title {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
+  color: #1E293B;
+  margin: 0 0 6px;
+}
+
+.hint {
+  margin: 0 0 20px;
+  color: #64748B;
+  font-size: 13px;
+  font-family: "Arial", sans-serif;
 }
 
 .profile-form {
@@ -99,43 +110,46 @@ p {
   gap: 16px;
 }
 
-label {
+.profile-form label {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 0.875rem;
-  color: #CBD5E1;
 }
 
-input {
-  padding: 10px 12px;
-  border: 1px solid #334155;
-  border-radius: 6px;
-  background: #0F172A;
-  color: #fff;
-  font-size: 1rem;
+.field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748B;
+  font-family: "Arial", sans-serif;
 }
 
-input::placeholder {
-  color: #475569;
+.profile-form input {
+  padding: 10px 14px;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  background: #F8FAFC;
+  color: #1E293B;
+  font-size: 14px;
+  font-family: "Arial", sans-serif;
 }
 
-input:disabled {
+.profile-form input:focus {
+  outline: none;
+  border-color: #C00000;
+}
+
+.profile-form input:disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-button {
+.save-btn {
+  margin-top: 8px;
   padding: 12px;
-  background: #3B82F6;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  cursor: pointer;
+  font-size: 13px;
 }
 
-button:disabled {
+.save-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
@@ -143,5 +157,6 @@ button:disabled {
 .error {
   color: #EF4444;
   margin: 0;
+  font-size: 13px;
 }
 </style>

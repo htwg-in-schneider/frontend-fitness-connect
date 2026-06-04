@@ -1,5 +1,7 @@
 <script setup>
-import { onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { useTrainerStore } from '../stores/trainer.js'
 import { useOrteStore } from '../stores/orte.js'
 import { useEventsStore } from '../stores/events.js'
@@ -10,14 +12,46 @@ import OrteSection from '../components/OrteSection.vue'
 import TrainerSection from '../components/TrainerSection.vue'
 import ContactSection from '../components/ContactSection.vue'
 
+const router = useRouter()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 const trainerStore = useTrainerStore()
 const orteStore = useOrteStore()
 const eventsStore = useEventsStore()
+
+const vorname = ref('')
+const nachname = ref('')
+const profilFarbe = ref('#EF4444')
+
+const initialen = computed(() => {
+  const v = vorname.value?.trim()
+  const n = nachname.value?.trim()
+  return ((v?.[0] || '') + (n?.[0] || '')).toUpperCase()
+})
+
+async function loadProfile() {
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch('http://localhost:8081/api/nutzer/me', {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      vorname.value = data.vorname
+      nachname.value = data.nachname
+      profilFarbe.value = data.profilFarbe || '#EF4444'
+    }
+  } catch (e) { /* ignore */ }
+}
 
 onMounted(() => {
   trainerStore.fetchAll()
   orteStore.fetchAll()
   eventsStore.fetchAll()
+  if (isAuthenticated.value) loadProfile()
+})
+
+watch(isAuthenticated, (authenticated) => {
+  if (authenticated) loadProfile()
 })
 </script>
 
@@ -36,7 +70,9 @@ onMounted(() => {
                 <div class="search-bar">
                     <input type="text" placeholder="Nach Sportart suchen…">
                 </div>
-                <button class="profile-icon">👤</button>
+                <button v-if="isAuthenticated" class="profile-avatar" @click="router.push('/profil')" :style="{ background: profilFarbe + '33', borderColor: profilFarbe }">
+                    <span :style="{ color: profilFarbe }">{{ initialen }}</span>
+                </button>
             </div>
         </header>
 
@@ -58,6 +94,25 @@ onMounted(() => {
     padding: 12px 24px;
     color: #C00000;
     font-size: 13px;
+}
+
+.profile-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2px solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: transform 0.15s;
+}
+
+.profile-avatar:hover {
+    transform: scale(1.1);
 }
 </style>
 

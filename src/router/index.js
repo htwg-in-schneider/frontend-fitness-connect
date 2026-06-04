@@ -6,6 +6,7 @@ import TrainerDetail from '../views/TrainerDetail.vue'
 import OrtDetail from '../views/OrtDetail.vue'
 import SportanlagenView from '../views/SportanlagenView.vue'
 import CompleteProfile from '../views/CompleteProfile.vue'
+import MeinProfil from '../views/MeinProfil.vue'
 import ImpressumView from '../views/ImpressumView.vue'
 import DatenschutzView from '../views/DatenschutzView.vue'
 
@@ -17,6 +18,7 @@ const routes = [
   { path: '/trainer/:id', component: TrainerDetail },
   { path: '/ort/:id', component: OrtDetail },
   { path: '/complete-profile', component: CompleteProfile },
+  { path: '/profil', component: MeinProfil },
   { path: '/impressum', component: ImpressumView },
   { path: '/datenschutz', component: DatenschutzView },
 ]

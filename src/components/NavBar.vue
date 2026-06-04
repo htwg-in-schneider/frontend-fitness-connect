@@ -26,7 +26,7 @@ function handleLogout() {
             <li @click="router.push('/events')"><NavButton emoji="📅" label="Events / Kurse" :active="route.path === '/events'" /></li>
             <li @click="router.push('/orte')"><NavButton emoji="🏟️" label="Sportanlagen" :active="route.path === '/orte'" /></li>
             <li><NavButton emoji="👥" label="Trainer" /></li>
-            <li><NavButton emoji="👤" label="Mein Profil" /></li>
+            <li v-if="isAuthenticated" @click="router.push('/profil')"><NavButton emoji="👤" label="Mein Profil" :active="route.path === '/profil'" /></li>
         </ul>
         <div class="topnav-auth">
             <template v-if="!isAuthenticated">

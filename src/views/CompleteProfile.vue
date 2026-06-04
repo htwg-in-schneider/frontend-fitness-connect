@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
 
@@ -9,6 +9,12 @@ const router = useRouter()
 const vorname = ref('')
 const nachname = ref('')
 const email = ref('')
+
+onMounted(() => {
+  if (user.value?.email) {
+    email.value = user.value.email
+  }
+})
 const error = ref('')
 const loading = ref(false)
 
@@ -49,7 +55,7 @@ async function submit() {
     <form @submit.prevent="submit" class="profile-form">
       <label>
         E-Mail
-        <input v-model="email" type="email" required placeholder="E-Mail-Adresse" />
+        <input v-model="email" type="email" required placeholder="E-Mail-Adresse" disabled />
       </label>
       <label>
         Vorname
@@ -112,6 +118,11 @@ input {
 
 input::placeholder {
   color: #475569;
+}
+
+input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 
 button {

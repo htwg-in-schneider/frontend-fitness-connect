@@ -9,6 +9,10 @@ const bannerStore = useBannerStore()
 const router = useRouter()
 const route = useRoute()
 const { isAuthenticated, loginWithRedirect, logout } = useAuth0()
+
+function handleLogout() {
+  logout({ logoutParams: { returnTo: window.location.origin } })
+}
 </script>
 
 <template>
@@ -30,7 +34,7 @@ const { isAuthenticated, loginWithRedirect, logout } = useAuth0()
                 <button class="auth-btn auth-btn--primary" @click="loginWithRedirect({ authorizationParams: { screen_hint: 'signup' } })">Registrieren</button>
             </template>
             <template v-else>
-                <button class="auth-btn" @click="logout({ logoutParams: { returnTo: window.location.origin } })">Abmelden</button>
+                <button class="auth-btn" @click="handleLogout">Abmelden</button>
             </template>
         </div>
     </nav>

@@ -3,12 +3,12 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
 
-const { loginWithRedirect } = useAuth0()
+const { loginWithRedirect, isAuthenticated } = useAuth0()
 const email = defineModel('email', { default: '' })
 </script>
 
 <template>
-    <section class="page-section section-hero">
+    <section v-if="!isAuthenticated" class="page-section section-hero">
         <div class="hero-card">
             <div class="hero-text">
                 <h2 class="hero-title">Dein Sport. Deine Stadt.</h2>
@@ -19,7 +19,7 @@ const email = defineModel('email', { default: '' })
                 <h3 class="login-title">Jetzt Registrieren:</h3>
                 <input class="login-input" type="text" placeholder="E-Mail" v-model="email">
                 <Button @click="loginWithRedirect({ authorizationParams: { screen_hint: 'signup', login_hint: email } })">Registrieren</Button>
-                <NavigationLink @click="loginWithRedirect()">Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
+                <NavigationLink @click="loginWithRedirect({ authorizationParams: { login_hint: email } })">Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
             </div>
         </div>
     </section>

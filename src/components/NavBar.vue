@@ -11,7 +11,7 @@ const route = useRoute()
 const { isAuthenticated, loginWithRedirect, logout } = useAuth0()
 
 function handleLogout() {
-  logout({ logoutParams: { returnTo: window.location.origin } })
+  logout({ logoutParams: { returnTo: window.location.origin + import.meta.env.BASE_URL } })
 }
 </script>
 

@@ -4,11 +4,16 @@ defineProps({
         type: String,
         default: null,
     },
+    to: {
+        type: String,
+        default: null,
+    },
 })
 </script>
 
 <template>
-    <a v-if="href" :href="href" class="nav-link"><slot /></a>
+    <RouterLink v-if="to" :to="to" class="nav-link"><slot /></RouterLink>
+    <a v-else-if="href" :href="href" class="nav-link"><slot /></a>
     <button v-else type="button" class="nav-link"><slot /></button>
 </template>
 

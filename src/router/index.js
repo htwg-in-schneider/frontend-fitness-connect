@@ -6,6 +6,8 @@ import TrainerDetail from '../views/TrainerDetail.vue'
 import OrtDetail from '../views/OrtDetail.vue'
 import SportanlagenView from '../views/SportanlagenView.vue'
 import CompleteProfile from '../views/CompleteProfile.vue'
+import ImpressumView from '../views/ImpressumView.vue'
+import DatenschutzView from '../views/DatenschutzView.vue'
 
 const routes = [
   { path: '/', component: Dashboard },
@@ -15,6 +17,8 @@ const routes = [
   { path: '/trainer/:id', component: TrainerDetail },
   { path: '/ort/:id', component: OrtDetail },
   { path: '/complete-profile', component: CompleteProfile },
+  { path: '/impressum', component: ImpressumView },
+  { path: '/datenschutz', component: DatenschutzView },
 ]
 
 // import.meta.env.BASE_URL picks up the `base` from vite.config.js

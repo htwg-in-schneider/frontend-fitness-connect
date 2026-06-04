@@ -2,6 +2,11 @@ import { defineStore } from 'pinia'
 
 const API = import.meta.env.VITE_API_BASE_URL
 
+function toFirstUppercase(value) {
+  if (!value || typeof value !== 'string') return value
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+}
+
 export const useOrteStore = defineStore('orte', {
   state: () => ({
     list: [],
@@ -24,7 +29,7 @@ export const useOrteStore = defineStore('orte', {
       const qs = params.toString()
       const res = await fetch(`${API}/api/orte${qs ? '?' + qs : ''}`)
       const data = await res.json()
-      this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl, art: o.art ? o.art.charAt(0).toUpperCase() + o.art.slice(1).toLowerCase() : o.art }))
+      this.list = data.map(o => ({ ...o, bild_pfad: o.bildUrl, art: toFirstUppercase(o.art) }))
     },
   },
 })

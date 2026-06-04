@@ -12,6 +12,11 @@ const orteStore = useOrteStore()
 const eingabe = ref(route.query.suche ?? '')
 const art = ref(route.query.art ?? '')
 
+function toFirstUppercase(value) {
+  if (!value || typeof value !== 'string') return value
+  return value.charAt(0).toUpperCase() + value.slice(1).toLowerCase()
+}
+
 function suchen() {
   const q = eingabe.value.trim()
   const a = art.value
@@ -51,7 +56,7 @@ watch(() => route.query, async (q) => {
           />
           <select v-model="art" class="filter-select">
             <option value="">Alle Arten</option>
-            <option v-for="a in orteStore.arten" :key="a" :value="a">{{ a }}</option>
+            <option v-for="a in orteStore.arten" :key="a" :value="a">{{ toFirstUppercase(a) }}</option>
           </select>
           <Button @click="suchen">Suchen</Button>
         </div>

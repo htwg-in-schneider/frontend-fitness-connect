@@ -9,6 +9,9 @@ import SportanlagenView from '../views/SportanlagenView.vue'
 import CompleteProfile from '../views/CompleteProfile.vue'
 import MeinProfil from '../views/MeinProfil.vue'
 import BecomeTrainer from '../views/BecomeTrainer.vue'
+import CreateEvent from '../views/CreateEvent.vue'
+import MeineEvents from '../views/MeineEvents.vue'
+import EditEvent from '../views/EditEvent.vue'
 import ImpressumView from '../views/ImpressumView.vue'
 import DatenschutzView from '../views/DatenschutzView.vue'
 
@@ -22,6 +25,9 @@ const routes = [
   { path: '/ort/:id', component: OrtDetail },
   { path: '/complete-profile', component: CompleteProfile },
   { path: '/become-trainer', component: BecomeTrainer },
+  { path: '/event-erstellen', component: CreateEvent },
+  { path: '/meine-events', component: MeineEvents },
+  { path: '/event-bearbeiten/:id', component: EditEvent },
   { path: '/profil', component: MeinProfil },
   { path: '/impressum', component: ImpressumView },
   { path: '/datenschutz', component: DatenschutzView },

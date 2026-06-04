@@ -212,6 +212,9 @@ onMounted(loadProfile)
         <div v-if="!isTrainer" class="trainer-link">
           <a href="#" @click.prevent="$router.push('/become-trainer')">Als Trainer registrieren →</a>
         </div>
+        <div class="trainer-link">
+          <a href="#" @click.prevent="$router.push('/meine-events')">Meine Events →</a>
+        </div>
       </div>
 
       <!-- Trainer Card -->

@@ -1,20 +1,83 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { useEventsStore } from '../stores/events.js'
-import { formatEventDate } from '../data.js'
+import { formatEventDate } from '../utils.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
 import { MapPin, Calendar, Armchair, User } from 'lucide-vue-next'
 
+const API = import.meta.env.VITE_API_BASE_URL
+
 const route = useRoute()
 const router = useRouter()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 const eventsStore = useEventsStore()
+const trainer = ref(null)
+const bereitsAngemeldet = ref(false)
+const showKursModal = ref(false)
 
-onMounted(() => eventsStore.fetchAll())
+onMounted(async () => {
+  await eventsStore.fetchAll()
+  await fetchTrainer()
+  await checkAnmeldung()
+})
+
+watch(() => route.params.id, async () => {
+  await fetchTrainer()
+  await checkAnmeldung()
+})
+
+async function fetchTrainer() {
+  trainer.value = null
+  const id = route.params.id
+  if (!id) return
+  try {
+    const res = await fetch(`${API}/api/events/${id}/trainer`)
+    if (res.ok) trainer.value = await res.json()
+  } catch (_) {}
+}
+
+async function checkAnmeldung() {
+  bereitsAngemeldet.value = false
+  if (!isAuthenticated.value) return
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch(`${API}/api/anmeldungen/check/${route.params.id}`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (res.ok) bereitsAngemeldet.value = await res.json()
+  } catch (_) {}
+}
 
 const event = computed(() => eventsStore.list.find(e => e.id === Number(route.params.id)))
+const istVoll = computed(() => event.value && event.value.anzahlAnmeldungen >= event.value.anzahlPlaetze)
+
+function handleTeilnehmen() {
+  if (event.value?.preis) {
+    showKursModal.value = true
+  } else {
+    beitreten()
+  }
+}
+
+async function beitreten() {
+  showKursModal.value = false
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch(`${API}/api/anmeldungen/${route.params.id}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (res.ok) {
+      bereitsAngemeldet.value = true
+      // refresh event data
+      await eventsStore.search({})
+    }
+  } catch (_) {}
+}
 
 function renderStars(rating) {
   const full = Math.floor(rating)
@@ -65,18 +128,22 @@ function renderStars(rating) {
               </li>
               <li>
                 <span class="info-label"><Armchair :size="14" /> Plätze</span>
-                <span class="info-value">{{ event.freiePlaetze }} / {{ event.anzahlPlaetze }} frei</span>
+                <span class="info-value">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }} / {{ event.anzahlPlaetze }} frei</span>
               </li>
             </ul>
           </div>
 
           <!-- Rechte Spalte: Trainer + Preis -->
           <div class="col-right">
-            <div v-if="event.trainerName" class="detail-card trainer-card">
-              <div class="trainer-info">
-                <p class="trainer-label"><User :size="14" /> Trainer</p>
-                <p class="trainer-name">{{ event.trainerName }}</p>
+            <div v-if="trainer" class="detail-card trainer-card">
+              <div class="trainer-card-top">
+                <img :src="trainer.profilbildUrl" :alt="trainer.name" class="trainer-img" />
+                <div class="trainer-info">
+                  <p class="trainer-label"><User :size="14" /> Trainer</p>
+                  <p class="trainer-name">{{ trainer.name }}</p>
+                </div>
               </div>
+              <Button @click="router.push('/trainer/' + trainer.id)">Profil ansehen</Button>
             </div>
 
             <div class="detail-card">
@@ -90,15 +157,14 @@ function renderStars(rating) {
                 <span class="price-label price-bold">Gesamtpreis</span>
                 <span class="price-value price-bold">{{ event.preis.toFixed(2) }} €</span>
               </div>
-              <h2 class="detail-section-title payment-title">Zahlungsmethode</h2>
-              <button class="apple-pay-btn">
-                <img src="/apple_pay.png" alt="Apple Pay" class="apple-pay-img" />
-              </button>
             </div>
           </div>
         </div>
 
-        <Button @click="router.back()">Jetzt bezahlen</Button>
+        <Button v-if="bereitsAngemeldet" variant="secondary" :disabled="true">Bereits angemeldet</Button>
+        <Button v-else :disabled="istVoll" @click="handleTeilnehmen">
+          {{ istVoll ? 'Ausgebucht' : 'Jetzt bezahlen' }}
+        </Button>
       </template>
 
       <!-- Event-Layout: Detail-Card links, Location-Hero rechts, gleiche Höhe -->
@@ -119,7 +185,7 @@ function renderStars(rating) {
               </li>
               <li>
                 <span class="info-label"><Armchair :size="14" /> Plätze</span>
-                <span class="info-value">{{ event.freiePlaetze }} / {{ event.anzahlPlaetze }} frei</span>
+                <span class="info-value">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }} / {{ event.anzahlPlaetze }} frei</span>
               </li>
             </ul>
           </div>
@@ -137,8 +203,22 @@ function renderStars(rating) {
           </div>
         </div>
 
-        <Button @click="router.back()">Jetzt beitreten</Button>
+        <Button v-if="bereitsAngemeldet" variant="secondary" :disabled="true">Bereits angemeldet</Button>
+        <Button v-else :disabled="istVoll" @click="handleTeilnehmen">
+          {{ istVoll ? 'Ausgebucht' : 'Teilnehmen' }}
+        </Button>
       </template>
+
+      <!-- Kurs beitreten Modal -->
+      <div v-if="showKursModal" class="modal-overlay" @click.self="showKursModal = false">
+        <div class="modal-card">
+          <p class="modal-text">Kostenpflichtig beitreten?</p>
+          <div class="modal-actions">
+            <button class="modal-btn modal-btn--cancel" @click="showKursModal = false">Abbrechen</button>
+            <button class="modal-btn modal-btn--confirm" @click="beitreten">Ja</button>
+          </div>
+        </div>
+      </div>
 
     </div>
 
@@ -359,11 +439,17 @@ function renderStars(rating) {
 /* 5. Trainer Card */
 .trainer-card {
   display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.trainer-card-top {
+  display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.trainer-avatar {
+.trainer-img {
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -473,6 +559,66 @@ function renderStars(rating) {
   cursor: pointer;
   padding: 0;
   font-family: "Arial", sans-serif;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px 28px;
+  max-width: 380px;
+  width: 90%;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-text {
+  font-size: 14px;
+  color: #1E293B;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.modal-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.15s;
+}
+
+.modal-btn--cancel {
+  background: #E2E8F0;
+  color: #475569;
+}
+
+.modal-btn--cancel:hover {
+  background: #CBD5E1;
+}
+
+.modal-btn--confirm {
+  background: #C00000;
+  color: #fff;
+}
+
+.modal-btn--confirm:hover {
+  background: #A00000;
 }
 </style>
 

@@ -109,12 +109,12 @@ function handleLogout() {
 }
 
 .auth-btn--primary {
-    background: #3B82F6;
-    border-color: #3B82F6;
+    background: #C00000;
+    border-color: #C00000;
 }
 
 .auth-btn--primary:hover {
-    background: #2563EB;
-    border-color: #2563EB;
+    background: #A00000;
+    border-color: #A00000;
 }
 </style>

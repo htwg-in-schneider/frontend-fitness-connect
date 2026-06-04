@@ -1,14 +1,16 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { useEventsStore } from '../stores/events.js'
-import { formatEventDate } from '../data.js'
+import { formatEventDate } from '../utils.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
-import { Calendar, MapPin, Tag, User } from 'lucide-vue-next'
+import { Calendar, MapPin, Tag, Plus, List } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
+const { isAuthenticated } = useAuth0()
 const eventsStore = useEventsStore()
 
 const eingabe = ref(route.query.suche ?? '')
@@ -42,7 +44,17 @@ watch(() => route.query, async (q) => {
     <div class="events-page">
 
       <div class="search-header">
-        <h1 class="page-title"><Calendar :size="20" /> Events &amp; Kurse</h1>
+        <div class="title-row">
+          <h1 class="page-title"><Calendar :size="20" /> Events &amp; Kurse</h1>
+          <div class="title-actions" v-if="isAuthenticated">
+            <button class="add-btn" @click="router.push('/meine-events')" title="Meine Events">
+              <List :size="20" />
+            </button>
+            <button class="add-btn" @click="router.push('/event-erstellen')" title="Event erstellen">
+              <Plus :size="20" />
+            </button>
+          </div>
+        </div>
         <div class="search-row">
           <input
             v-model="eingabe"
@@ -80,11 +92,8 @@ watch(() => route.query, async (q) => {
             <p class="event-detail"><Tag :size="13" /> {{ event.sportart }}</p>
             <p class="event-detail"><MapPin :size="13" /> {{ event.ort?.name }}</p>
             <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
-            <p v-if="event.trainerName" class="event-detail"><User :size="13" /> {{ event.trainerName }}</p>
-            <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
-            <Button @click="router.push('/event/' + event.id)">
-              {{ event.preis ? 'Kurs ansehen' : 'Teilnehmen' }}
-            </Button>
+            <p class="event-spots">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }}/{{ event.anzahlPlaetze }} Plätze frei</p>
+            <Button @click="router.push('/event/' + event.id)">Ansehen</Button>
           </div>
         </div>
       </div>
@@ -102,6 +111,35 @@ watch(() => route.query, async (q) => {
 
 .search-header {
   margin-bottom: 32px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.add-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #C00000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.add-btn:hover {
+  background: #A00000;
 }
 
 .page-title {

@@ -2,7 +2,6 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTrainerStore } from '../stores/trainer.js'
-import { trainerDisplayName } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import { Users, Star } from 'lucide-vue-next'
@@ -65,9 +64,9 @@ watch(() => route.query, async (q) => {
 
       <div class="trainer-grid">
         <div class="trainer-card" v-for="t in trainerStore.list" :key="t.id">
-          <img :src="t.profilbild_pfad" :alt="trainerDisplayName(t)" class="trainer-image">
+          <img :src="t.profilbild_pfad" :alt="t.name" class="trainer-image">
           <div class="trainer-card-body">
-            <h3 class="trainer-name">{{ trainerDisplayName(t) }}</h3>
+            <h3 class="trainer-name">{{ t.name }}</h3>
             <p class="trainer-art">{{ t.trainerart }}</p>
             <p class="trainer-rating"><Star :size="13" /> {{ t.bewertung }}</p>
             <Button @click="$router.push('/trainer/' + t.id)">Profil ansehen</Button>

@@ -3,7 +3,6 @@ import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTrainerStore } from '../stores/trainer.js'
 import { useEventsStore } from '../stores/events.js'
-import { trainerDisplayName } from '../data.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
@@ -45,10 +44,10 @@ function renderStars(rating) {
 
       <!-- Profile Hero Card -->
       <div class="profile-hero-card">
-        <img :src="t.profilbild_pfad" :alt="trainerDisplayName(t)" class="profile-avatar" />
+        <img :src="t.profilbild_pfad" :alt="t.name" class="profile-avatar" />
         <div class="profile-hero-info">
           <p class="profile-sport">{{ t.trainerart }}</p>
-          <h1 class="profile-name">{{ t.kontoinhaber }}</h1>
+          <h1 class="profile-name">{{ t.name }}</h1>
           <p class="profile-stars" :title="t.bewertung + ' / 5'">
             {{ renderStars(t.bewertung) }}
             <span class="rating-num">{{ t.bewertung }}</span>
@@ -82,7 +81,7 @@ function renderStars(rating) {
 
       <!-- Kurse by this trainer -->
       <div v-if="coursesByTrainer.length" class="detail-card">
-        <h2 class="detail-section-title">Kurse von {{ trainerDisplayName(t) }}</h2>
+        <h2 class="detail-section-title">Kurse von {{ t.name }}</h2>
         <ul class="event-list">
           <li
             v-for="e in coursesByTrainer"

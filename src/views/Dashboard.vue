@@ -75,9 +75,12 @@ watch(isAuthenticated, (authenticated) => {
                 </div>
             </div>
             <div class="header-right">
-                <div class="search-bar">
-                    <input type="text" placeholder="Nach Sportart suchen…">
-                </div>
+                <button v-if="isAuthenticated" class="create-event-btn" @click="router.push('/event-erstellen')">
+                    Erstelle dein Event
+                </button>
+                <button v-if="isAuthenticated" class="create-event-btn" @click="router.push('/meine-events')">
+                    Meine Events
+                </button>
                 <button v-if="isAuthenticated && trainerProfilbild" class="profile-avatar trainer-img-btn" @click="router.push('/profil')">
                     <img :src="trainerProfilbild" alt="Profil" class="trainer-img" />
                 </button>
@@ -138,6 +141,23 @@ watch(isAuthenticated, (authenticated) => {
     height: 100%;
     object-fit: cover;
     border-radius: 50%;
+}
+
+.create-event-btn {
+    padding: 8px 14px;
+    background: #C00000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: bold;
+    font-family: "Arial Rounded MT", "Arial", sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.create-event-btn:hover {
+    background: #A00000;
 }
 </style>
 

@@ -1,6 +1,6 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { formatEventDate } from '../data.js'
+import { formatEventDate } from '../utils.js'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
 import { MapPin, Calendar } from 'lucide-vue-next'
@@ -33,8 +33,8 @@ defineProps({
                     <h3 class="event-title">{{ event.name }}</h3>
                     <p class="event-detail"><MapPin :size="13" /> {{ event.ort.name }}</p>
                     <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
-                    <p class="event-spots">{{ event.freiePlaetze }}/{{ event.anzahlPlaetze }} Plätze frei</p>
-                    <Button @click="router.push('/event/' + event.id)">Teilnehmen</Button>
+                    <p class="event-spots">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }}/{{ event.anzahlPlaetze }} Plätze frei</p>
+                    <Button @click="router.push('/event/' + event.id)">Ansehen</Button>
                 </div>
             </div>
         </div>

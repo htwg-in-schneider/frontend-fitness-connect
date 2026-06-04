@@ -1,6 +1,5 @@
 <script setup>
 import { useRouter } from 'vue-router'
-import { trainerDisplayName } from '../data.js'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
 
@@ -22,10 +21,10 @@ defineProps({
         </div>
         <div class="trainer-row">
             <div class="trainer-card" v-for="t in trainer" :key="t.id">
-                <img :src="t.profilbild_pfad" :alt="trainerDisplayName(t)" class="trainer-image">
+                <img :src="t.profilbild_pfad" :alt="t.name" class="trainer-image">
                 <div class="trainer-card-body">
                     <div>
-                        <h3 class="trainer-name">{{ trainerDisplayName(t) }}</h3>
+                        <h3 class="trainer-name">{{ t.name }}</h3>
                         <p class="trainer-detail">{{ t.trainerart }} · ⭐ {{ t.bewertung }}</p>
                     </div>
                     <div>

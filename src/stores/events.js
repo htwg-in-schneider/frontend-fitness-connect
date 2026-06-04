@@ -8,14 +8,12 @@ function mapEvent(raw) {
     typ: raw.typ,
     name: raw.name,
     sportart: raw.sportart,
-    date: new Date(raw.datum),
+    date: new Date(raw.zeit),
     anzahlPlaetze: raw.anzahlPlaetze,
-    belegtePlaetze: raw.belegtePlaetze,
-    freiePlaetze: raw.freiePlaetze,
+    anzahlAnmeldungen: raw.anzahlAnmeldungen,
     emoji: raw.emoji,
     ersteller: raw.ersteller,
     preis: raw.preis ?? null,
-    trainerName: raw.trainerName ?? null,
     ort: raw.ort ? { ...raw.ort, bild_pfad: raw.ort.bildUrl } : null,
   }
 }

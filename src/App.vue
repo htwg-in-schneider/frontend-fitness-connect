@@ -7,13 +7,14 @@ import { useBannerStore } from './stores/banner.js'
 
 const bannerStore = useBannerStore()
 const router = useRouter()
+const API = import.meta.env.VITE_API_BASE_URL
 const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 
 watch(isAuthenticated, async (authenticated) => {
   if (!authenticated) return
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me', {
+    const res = await fetch(`${API}/api/nutzer/me`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
     if (res.status === 404) {

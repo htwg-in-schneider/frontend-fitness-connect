@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import Dashboard from '../views/Dashboard.vue'
 import EventDetail from '../views/EventDetail.vue'
 import EventsView from '../views/EventsView.vue'
@@ -15,6 +16,8 @@ import EditEvent from '../views/EditEvent.vue'
 import ImpressumView from '../views/ImpressumView.vue'
 import DatenschutzView from '../views/DatenschutzView.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
+
+const publicPaths = ['/', '/impressum', '/datenschutz']
 
 const routes = [
   { path: '/', component: Dashboard },
@@ -40,6 +43,13 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+})
+
+router.beforeEach((to) => {
+  const { isAuthenticated } = useAuth0()
+  if (!publicPaths.includes(to.path) && !isAuthenticated.value) {
+    return '/'
+  }
 })
 
 export default router

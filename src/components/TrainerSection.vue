@@ -1,9 +1,11 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
 
 const router = useRouter()
+const { isAuthenticated } = useAuth0()
 
 defineProps({
     trainer: {
@@ -11,13 +13,21 @@ defineProps({
         required: true,
     },
 })
+
+function handleTrainerClick(trainerId) {
+  if (isAuthenticated.value) {
+    router.push('/trainer/' + trainerId)
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
 </script>
 
 <template>
     <section class="page-section section-trainer">
         <div class="section-header">
             <h2 class="section-title">Trainer</h2>
-            <NavigationLink to="/trainer">Alle anzeigen →</NavigationLink>
+            <NavigationLink v-if="isAuthenticated" to="/trainer">Alle anzeigen →</NavigationLink>
         </div>
         <div class="trainer-row">
             <div class="trainer-card" v-for="t in trainer" :key="t.id">
@@ -28,7 +38,7 @@ defineProps({
                         <p class="trainer-detail">{{ t.trainerart }} · ⭐ {{ t.bewertung }}</p>
                     </div>
                     <div>
-                        <Button @click="router.push('/trainer/' + t.id)">Profil ansehen</Button>
+                        <Button @click="handleTrainerClick(t.id)">Profil ansehen</Button>
                     </div>
                 </div>
             </div>

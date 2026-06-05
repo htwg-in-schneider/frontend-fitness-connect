@@ -1,10 +1,12 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
 import { MapPin } from 'lucide-vue-next'
 
 const router = useRouter()
+const { isAuthenticated } = useAuth0()
 
 defineProps({
     orte: {
@@ -12,13 +14,21 @@ defineProps({
         required: true,
     },
 })
+
+function handleOrtClick(ortId) {
+  if (isAuthenticated.value) {
+    router.push('/ort/' + ortId)
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
 </script>
 
 <template>
     <section class="page-section section-orte">
         <div class="section-header">
             <h2 class="section-title">Orte</h2>
-            <NavigationLink @click="router.push('/orte')">Alle anzeigen →</NavigationLink>
+            <NavigationLink v-if="isAuthenticated" @click="router.push('/orte')">Alle anzeigen →</NavigationLink>
         </div>
         <div class="orte-row">
             <div class="ort-card" v-for="ort in orte" :key="ort.id">
@@ -26,7 +36,7 @@ defineProps({
                 <div class="ort-card-body">
                     <h3 class="ort-title">{{ ort.name }}</h3>
                     <p class="ort-address"><MapPin :size="13" /> {{ ort.adresse }}</p>
-                    <Button @click="router.push('/ort/' + ort.id)">Ansehen</Button>
+                    <Button @click="handleOrtClick(ort.id)">Ansehen</Button>
                 </div>
             </div>
         </div>

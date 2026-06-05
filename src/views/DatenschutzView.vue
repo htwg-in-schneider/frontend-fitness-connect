@@ -1,11 +1,15 @@
 <script setup>
+import { useRouter } from 'vue-router'
 import NavBar from '../components/NavBar.vue'
+
+const router = useRouter()
 </script>
 
 <template>
     <NavBar />
     <main class="legal-page">
         <article class="legal-content">
+            <button class="back-btn" @click="router.back()">← Zurück</button>
             <h1>Datenschutzerklärung</h1>
 
             <section>
@@ -68,6 +72,21 @@ h2 {
 p {
     color: #64748B;
     line-height: 1.6;
+}
+
+.back-btn {
+    background: none;
+    border: none;
+    color: #C00000;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 16px;
+}
+
+.back-btn:hover {
+    text-decoration: underline;
 }
 
 @media (max-width: 768px) {

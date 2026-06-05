@@ -1,13 +1,25 @@
 <script setup>
+import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
-import { LayoutDashboard, Calendar, MapPin, Users, User } from 'lucide-vue-next'
+import { useAdminStore } from '../stores/admin.js'
+import { LayoutDashboard, Calendar, MapPin, Users, User, Shield } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
-const { isAuthenticated } = useAuth0()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
+const adminStore = useAdminStore()
 
-const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User }
+const showAdmin = ref(false)
+
+watch(isAuthenticated, async (auth) => {
+  if (auth) {
+    adminStore.setTokenGetter(getAccessTokenSilently)
+    showAdmin.value = await adminStore.checkAdmin()
+  }
+}, { immediate: true })
+
+const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User, Shield }
 </script>
 
 <template>
@@ -16,21 +28,25 @@ const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User }
       <component :is="iconMap.LayoutDashboard" :size="22" />
       <span class="mobile-nav-label">Dashboard</span>
     </button>
-    <button class="mobile-nav-item" :class="{ active: route.path === '/events' }" @click="router.push('/events')">
+    <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/events' }" @click="router.push('/events')">
       <component :is="iconMap.Calendar" :size="22" />
       <span class="mobile-nav-label">Events</span>
     </button>
-    <button class="mobile-nav-item" :class="{ active: route.path === '/orte' }" @click="router.push('/orte')">
+    <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/orte' }" @click="router.push('/orte')">
       <component :is="iconMap.MapPin" :size="22" />
       <span class="mobile-nav-label">Sportanlagen</span>
     </button>
-    <button class="mobile-nav-item" :class="{ active: route.path === '/trainer' }" @click="router.push('/trainer')">
+    <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/trainer' }" @click="router.push('/trainer')">
       <component :is="iconMap.Users" :size="22" />
       <span class="mobile-nav-label">Trainer</span>
     </button>
     <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/profil' }" @click="router.push('/profil')">
       <component :is="iconMap.User" :size="22" />
       <span class="mobile-nav-label">Profil</span>
+    </button>
+    <button v-if="showAdmin" class="mobile-nav-item" :class="{ active: route.path === '/admin' }" @click="router.push('/admin')">
+      <component :is="iconMap.Shield" :size="22" />
+      <span class="mobile-nav-label">Admin</span>
     </button>
   </nav>
 </template>

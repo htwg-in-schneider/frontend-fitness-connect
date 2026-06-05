@@ -1,11 +1,13 @@
 <script setup>
 import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { formatEventDate } from '../utils.js'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
 import { MapPin, Calendar } from 'lucide-vue-next'
 
 const router = useRouter()
+const { isAuthenticated } = useAuth0()
 
 defineProps({
     events: {
@@ -13,13 +15,21 @@ defineProps({
         required: true,
     },
 })
+
+function handleEventClick(eventId) {
+  if (isAuthenticated.value) {
+    router.push('/event/' + eventId)
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
 </script>
 
 <template>
     <section class="page-section section-events">
         <div class="section-header">
             <h2 class="section-title">Events</h2>
-            <NavigationLink @click="router.push('/events')">Alle anzeigen →</NavigationLink>
+            <NavigationLink v-if="isAuthenticated" @click="router.push('/events')">Alle anzeigen →</NavigationLink>
         </div>
         <div class="events-row">
             <div class="event-card" v-for="event in events" :key="event.id">
@@ -34,7 +44,7 @@ defineProps({
                     <p class="event-detail"><MapPin :size="13" /> {{ event.ort.name }}</p>
                     <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
                     <p class="event-spots">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }}/{{ event.anzahlPlaetze }} Plätze frei</p>
-                    <Button @click="router.push('/event/' + event.id)">Ansehen</Button>
+                    <Button @click="handleEventClick(event.id)">Ansehen</Button>
                 </div>
             </div>
         </div>

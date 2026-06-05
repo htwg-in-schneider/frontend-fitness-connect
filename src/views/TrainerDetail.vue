@@ -1,17 +1,24 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { useTrainerStore } from '../stores/trainer.js'
 import { useEventsStore } from '../stores/events.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
-import { Phone, Dumbbell, Mail, MessageCircle } from 'lucide-vue-next'
+import { Phone, Dumbbell, Mail, MessageCircle, Star } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 const trainerStore = useTrainerStore()
 const eventsStore = useEventsStore()
+const API = import.meta.env.VITE_API_BASE_URL
+
+const showRatingPopup = ref(false)
+const selectedStars = ref(0)
+const ratingLoading = ref(false)
 
 onMounted(() => {
   trainerStore.fetchAll()
@@ -28,6 +35,26 @@ function renderStars(rating) {
   const full = Math.floor(rating)
   const half = rating - full >= 0.5
   return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - (half ? 1 : 0))
+}
+
+async function submitRating() {
+  if (selectedStars.value < 1) return
+  ratingLoading.value = true
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch(`${API}/api/trainer/${t.value.id}/rate`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stars: selectedStars.value })
+    })
+    if (res.ok) {
+      await trainerStore.fetchAll()
+      showRatingPopup.value = false
+      selectedStars.value = 0
+    }
+  } finally {
+    ratingLoading.value = false
+  }
 }
 </script>
 
@@ -50,8 +77,11 @@ function renderStars(rating) {
           <h1 class="profile-name">{{ t.name }}</h1>
           <p class="profile-stars" :title="t.bewertung + ' / 5'">
             {{ renderStars(t.bewertung) }}
-            <span class="rating-num">{{ t.bewertung }}</span>
+            <span class="rating-num">{{ t.bewertung }} ({{ t.anzahlBewertungen }})</span>
           </p>
+          <button v-if="isAuthenticated" class="rate-btn" @click="showRatingPopup = true">
+            <Star :size="14" /> Bewerten
+          </button>
         </div>
       </div>
 
@@ -108,6 +138,26 @@ function renderStars(rating) {
       </div>
 
       <Button @click="router.back()">Zurück</Button>
+
+      <!-- Rating Popup -->
+      <div v-if="showRatingPopup" class="rating-overlay" @click.self="showRatingPopup = false">
+        <div class="rating-popup">
+          <h3 class="rating-popup-title">Trainer bewerten</h3>
+          <div class="stars-row">
+            <span
+              v-for="i in 5"
+              :key="i"
+              class="star-btn"
+              :class="{ active: i <= selectedStars }"
+              @click="selectedStars = i"
+            >★</span>
+          </div>
+          <div class="rating-actions">
+            <button class="rating-cancel" @click="showRatingPopup = false; selectedStars = 0">Abbrechen</button>
+            <Button :disabled="!selectedStars || ratingLoading" @click="submitRating">Absenden</Button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div v-else class="not-found">
@@ -388,6 +438,113 @@ function renderStars(rating) {
 
 .back-btn:hover {
   text-decoration: underline;
+}
+
+/* Rate button */
+.rate-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 1.5px solid #F59E0B;
+  color: #F59E0B;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  margin-top: 4px;
+}
+
+.rate-btn:hover {
+  background: #F59E0B;
+  color: #fff;
+}
+
+/* Rating overlay */
+.rating-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.rating-popup {
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 340px;
+  width: 90%;
+}
+
+.rating-popup-title {
+  font-size: 18px;
+  font-weight: bold;
+  font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
+  color: #1E293B;
+  margin: 0 0 4px;
+}
+
+.rating-popup-sub {
+  font-size: 13px;
+  color: #64748B;
+  font-family: "Arial", sans-serif;
+  margin: 0 0 18px;
+}
+
+.stars-row {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.star-btn {
+  font-size: 32px;
+  color: #CBD5E1;
+  cursor: pointer;
+  transition: color 0.1s;
+}
+
+.star-btn.active {
+  color: #F59E0B;
+}
+
+.rating-label {
+  font-size: 13px;
+  color: #F59E0B;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+  margin: 4px 0 14px;
+}
+
+.rating-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.rating-cancel {
+  background: none;
+  border: none;
+  color: #64748B;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+  cursor: pointer;
+  padding: 8px 14px;
+}
+
+.rating-cancel:hover {
+  color: #1E293B;
 }
 </style>
 

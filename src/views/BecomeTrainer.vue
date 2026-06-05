@@ -110,6 +110,7 @@ async function submit() {
         <button type="submit" class="btn-default save-btn" :disabled="loading">
           {{ loading ? 'Wird gespeichert…' : 'Als Trainer registrieren' }}
         </button>
+        <button type="button" class="btn-cancel" @click="router.push('/profil')">Abbrechen</button>
       </form>
     </div>
   </div>
@@ -231,5 +232,22 @@ async function submit() {
   color: #EF4444;
   margin: 0;
   font-size: 13px;
+}
+
+.btn-cancel {
+  background: none;
+  border: 1px solid #E2E8F0;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: "Arial", sans-serif;
+  color: #64748B;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-cancel:hover {
+  background: #F1F5F9;
 }
 </style>

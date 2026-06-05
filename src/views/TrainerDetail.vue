@@ -6,7 +6,7 @@ import { useEventsStore } from '../stores/events.js'
 import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
-import { Phone, Dumbbell } from 'lucide-vue-next'
+import { Phone, Dumbbell, Mail, MessageCircle } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -76,6 +76,14 @@ function renderStars(rating) {
               <span class="info-value">{{ t.trainerart }}</span>
             </li>
           </ul>
+          <div class="contact-buttons">
+            <a :href="'mailto:' + t.email" class="contact-btn contact-btn--email">
+              <Mail :size="16" /> E-Mail schreiben
+            </a>
+            <a :href="'https://wa.me/' + t.telefonnummer.replace(/[\s+]/g, '')" target="_blank" rel="noopener" class="contact-btn contact-btn--whatsapp">
+              <MessageCircle :size="16" /> WhatsApp
+            </a>
+          </div>
         </div>
       </div>
 
@@ -113,7 +121,6 @@ function renderStars(rating) {
 <style scoped>
 .detail-page {
   max-width: 1000px;
-  margin: 32px auto;
   padding: 0 16px 40px;
   display: flex;
   flex-direction: column;
@@ -267,6 +274,47 @@ function renderStars(rating) {
   color: #1E293B;
   font-weight: 600;
   text-align: right;
+}
+
+/* Contact buttons */
+.contact-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.contact-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: bold;
+  font-family: "Arial Rounded MT", "Arial", sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s ease, opacity 0.15s ease;
+  flex: 1;
+  justify-content: center;
+}
+
+.contact-btn--email {
+  background: #C00000;
+  color: #FFFFFF;
+}
+
+.contact-btn--email:hover {
+  background: #A00000;
+}
+
+.contact-btn--whatsapp {
+  background: #25D366;
+  color: #FFFFFF;
+}
+
+.contact-btn--whatsapp:hover {
+  background: #1DA851;
 }
 
 /* Event / Course list */

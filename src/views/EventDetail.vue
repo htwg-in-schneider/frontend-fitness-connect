@@ -233,7 +233,6 @@ function renderStars(rating) {
 <style scoped>
 .detail-page {
   max-width: 1000px;
-  margin: 32px auto;
   padding: 0 16px 40px;
   display: flex;
   flex-direction: column;

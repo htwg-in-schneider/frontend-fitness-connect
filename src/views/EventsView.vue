@@ -60,7 +60,7 @@ watch(() => route.query, async (q) => {
             v-model="eingabe"
             class="search-input"
             type="search"
-            placeholder="Event oder Kurs finden…"
+            placeholder="Event finden…"
             @keyup.enter="suchen"
           />
           <select v-model="sportart" class="filter-select">
@@ -72,7 +72,7 @@ watch(() => route.query, async (q) => {
       </div>
 
       <div v-if="eventsStore.list.length === 0" class="keine-ergebnisse">
-        Keine Events oder Kurse gefunden.
+        Keine Events gefunden.
       </div>
 
       <div class="events-grid">
@@ -106,7 +106,6 @@ watch(() => route.query, async (q) => {
 .events-page {
   padding: 32px 24px;
   max-width: 1100px;
-  margin: 0 auto;
 }
 
 .search-header {

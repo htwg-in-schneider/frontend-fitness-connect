@@ -66,7 +66,7 @@ function submitContactForm() {
     display: grid;
     grid-template-columns: minmax(220px, 0.9fr) minmax(280px, 1.1fr);
     gap: 28px;
-    align-items: start;
+    align-items: center;
 }
 
 .contact-kicker {

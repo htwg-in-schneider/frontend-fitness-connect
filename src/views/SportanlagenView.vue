@@ -87,7 +87,6 @@ watch(() => route.query, async (q) => {
 .sportanlagen-page {
   padding: 32px 24px;
   max-width: 1100px;
-  margin: 0 auto;
 }
 
 .search-header {

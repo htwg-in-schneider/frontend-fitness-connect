@@ -22,7 +22,6 @@ const profilbilder = [
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/LisaM.png',
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/MaxS.png',
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/AlidaW.png',
-  'https://ui-avatars.com/api/?name=Trainer&size=256&background=3B82F6&color=fff',
 ]
 
 async function submit() {

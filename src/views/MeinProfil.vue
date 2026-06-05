@@ -40,19 +40,12 @@ const farben = [
   '#EC4899', '#64748B', '#06B6D4', '#84CC16',
 ]
 
-const festeBilder = [
+const profilbilder = [
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/IlyasK.png',
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/LisaM.png',
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/MaxS.png',
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/AlidaW.png',
 ]
-
-const initialsAvatar = computed(() => {
-  const name = (vorname.value + ' ' + nachname.value).trim() || 'Trainer'
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=256&background=3B82F6&color=fff`
-})
-
-const profilbilder = computed(() => [...festeBilder, initialsAvatar.value])
 
 const initialen = computed(() => {
   const v = vorname.value?.trim()
@@ -146,7 +139,7 @@ async function saveTrainerProfile() {
         bic: bic.value,
         telefonnummer: telefonnummer.value,
         zitat: zitat.value,
-        profilbildUrl: profilbildUrl.value.includes('ui-avatars.com') ? initialsAvatar.value : profilbildUrl.value,
+        profilbildUrl: profilbildUrl.value,
       }),
     })
     if (res.ok) {
@@ -263,20 +256,13 @@ onMounted(loadProfile)
             <span class="field-label">Profilbild</span>
             <div class="image-grid">
               <div
-                v-for="bild in festeBilder"
+                v-for="bild in profilbilder"
                 :key="bild"
                 class="image-option"
                 :class="{ selected: profilbildUrl === bild }"
                 @click="profilbildUrl = bild"
               >
                 <img :src="bild" alt="Profilbild" />
-              </div>
-              <div
-                class="image-option"
-                :class="{ selected: profilbildUrl.includes('ui-avatars.com') }"
-                @click="profilbildUrl = initialsAvatar"
-              >
-                <img :src="initialsAvatar" alt="Initialen-Avatar" />
               </div>
             </div>
           </div>

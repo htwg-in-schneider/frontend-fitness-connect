@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 
 const { getAccessTokenSilently } = useAuth0()
 const router = useRouter()
+const API = import.meta.env.VITE_API_BASE_URL
 
 const trainerart = ref('')
 const kontoinhaber = ref('')
@@ -32,7 +33,7 @@ async function submit() {
   loading.value = true
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me/become-trainer', {
+    const res = await fetch(`${API}/api/nutzer/me/become-trainer`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 
 const { getAccessTokenSilently, user } = useAuth0()
 const router = useRouter()
+const API = import.meta.env.VITE_API_BASE_URL
 
 const vorname = ref('')
 const nachname = ref('')
@@ -23,7 +24,7 @@ async function submit() {
   loading.value = true
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me/complete-profile', {
+    const res = await fetch(`${API}/api/nutzer/me/complete-profile`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

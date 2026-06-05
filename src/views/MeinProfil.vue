@@ -4,6 +4,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import NavBar from '../components/NavBar.vue'
 
 const { getAccessTokenSilently } = useAuth0()
+const API = import.meta.env.VITE_API_BASE_URL
 
 const vorname = ref('')
 const nachname = ref('')
@@ -50,7 +51,7 @@ async function loadProfile() {
   loading.value = true
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me', {
+    const res = await fetch(`${API}/api/nutzer/me`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
     if (res.ok) {
@@ -62,7 +63,7 @@ async function loadProfile() {
       rolle.value = data.rolle
     }
     // Load trainer data if trainer
-    const trainerRes = await fetch('http://localhost:8081/api/nutzer/me/trainer', {
+    const trainerRes = await fetch(`${API}/api/nutzer/me/trainer`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
     if (trainerRes.ok) {
@@ -88,7 +89,7 @@ async function saveProfile() {
   saving.value = true
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me', {
+    const res = await fetch(`${API}/api/nutzer/me`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -119,7 +120,7 @@ async function saveTrainerProfile() {
   savingTrainer.value = true
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me/trainer', {
+    const res = await fetch(`${API}/api/nutzer/me/trainer`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,

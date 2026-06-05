@@ -17,6 +17,7 @@ const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 const trainerStore = useTrainerStore()
 const orteStore = useOrteStore()
 const eventsStore = useEventsStore()
+const API = import.meta.env.VITE_API_BASE_URL
 
 const vorname = ref('')
 const nachname = ref('')
@@ -32,7 +33,7 @@ const initialen = computed(() => {
 async function loadProfile() {
   try {
     const token = await getAccessTokenSilently()
-    const res = await fetch('http://localhost:8081/api/nutzer/me', {
+    const res = await fetch(`${API}/api/nutzer/me`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
     if (res.ok) {
@@ -41,7 +42,7 @@ async function loadProfile() {
       nachname.value = data.nachname
       profilFarbe.value = data.profilFarbe || '#EF4444'
     }
-    const trainerRes = await fetch('http://localhost:8081/api/nutzer/me/trainer', {
+    const trainerRes = await fetch(`${API}/api/nutzer/me/trainer`, {
       headers: { 'Authorization': `Bearer ${token}` },
     })
     if (trainerRes.ok) {

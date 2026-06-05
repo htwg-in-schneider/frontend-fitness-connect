@@ -1,7 +1,7 @@
 <script setup>
-import { LayoutDashboard, Calendar, MapPin, Users, User } from 'lucide-vue-next'
+import { LayoutDashboard, Calendar, MapPin, Users, User, Shield } from 'lucide-vue-next'
 
-const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User }
+const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User, Shield }
 
 const props = defineProps({
     icon: {

@@ -1,14 +1,26 @@
 <script setup>
+import { ref, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
 import logoLight from '../assets/logos/LogoFitnessConnectLight.png'
 import NavButton from './NavButton.vue'
 import { useBannerStore } from '../stores/banner.js'
+import { useAdminStore } from '../stores/admin.js'
 
 const bannerStore = useBannerStore()
+const adminStore = useAdminStore()
 const router = useRouter()
 const route = useRoute()
-const { isAuthenticated, loginWithRedirect, logout } = useAuth0()
+const { isAuthenticated, loginWithRedirect, logout, getAccessTokenSilently } = useAuth0()
+
+const showAdmin = ref(false)
+
+watch(isAuthenticated, async (auth) => {
+  if (auth) {
+    adminStore.setTokenGetter(getAccessTokenSilently)
+    showAdmin.value = await adminStore.checkAdmin()
+  }
+}, { immediate: true })
 
 function handleLogout() {
   logout({ logoutParams: { returnTo: window.location.origin + import.meta.env.BASE_URL } })
@@ -27,6 +39,7 @@ function handleLogout() {
             <li @click="router.push('/orte')"><NavButton icon="MapPin" label="Sportanlagen" :active="route.path === '/orte'" /></li>
             <li @click="router.push('/trainer')"><NavButton icon="Users" label="Trainer" :active="route.path === '/trainer'" /></li>
             <li v-if="isAuthenticated" @click="router.push('/profil')"><NavButton icon="User" label="Mein Profil" :active="route.path === '/profil'" /></li>
+            <li v-if="showAdmin" @click="router.push('/admin')"><NavButton icon="Shield" label="Admin" :active="route.path === '/admin'" /></li>
         </ul>
         <div class="topnav-auth">
             <template v-if="!isAuthenticated">

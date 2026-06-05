@@ -14,6 +14,7 @@ import MeineEvents from '../views/MeineEvents.vue'
 import EditEvent from '../views/EditEvent.vue'
 import ImpressumView from '../views/ImpressumView.vue'
 import DatenschutzView from '../views/DatenschutzView.vue'
+import AdminDashboard from '../views/AdminDashboard.vue'
 
 const routes = [
   { path: '/', component: Dashboard },
@@ -31,6 +32,7 @@ const routes = [
   { path: '/profil', component: MeinProfil },
   { path: '/impressum', component: ImpressumView },
   { path: '/datenschutz', component: DatenschutzView },
+  { path: '/admin', component: AdminDashboard },
 ]
 
 // import.meta.env.BASE_URL picks up the `base` from vite.config.js

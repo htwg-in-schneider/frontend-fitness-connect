@@ -155,7 +155,6 @@ watch(() => route.query, async (q) => {
   max-width: 360px;
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -170,6 +169,7 @@ watch(() => route.query, async (q) => {
   height: 200px;
   object-fit: cover;
   display: block;
+  border-radius: 12px 12px 0 0;
 }
 
 .trainer-card-body {
@@ -200,5 +200,26 @@ watch(() => route.query, async (q) => {
   align-items: center;
   gap: 4px;
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .search-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input,
+  .filter-select {
+    max-width: 100%;
+  }
+
+  .trainer-grid {
+    flex-direction: column;
+  }
+
+  .trainer-card {
+    max-width: 100%;
+    flex-basis: 100%;
+  }
 }
 </style>

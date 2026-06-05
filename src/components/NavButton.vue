@@ -55,9 +55,4 @@ const props = defineProps({
     margin-right: 2px;
 }
 
-@media (max-width: 768px) {
-    .nav-btn-label {
-        display: none;
-    }
-}
 </style>

@@ -93,6 +93,12 @@ function handleLogout() {
     flex-shrink: 0;
 }
 
+@media (max-width: 768px) {
+    .topnav {
+        display: none;
+    }
+}
+
 .auth-btn {
     background: transparent;
     border: 1px solid rgba(255, 255, 255, 0.4);

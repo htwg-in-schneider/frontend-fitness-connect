@@ -150,7 +150,6 @@ watch(() => route.query, async (q) => {
   max-width: 360px;
   background: #fff;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -165,6 +164,7 @@ watch(() => route.query, async (q) => {
   height: 180px;
   object-fit: cover;
   display: block;
+  border-radius: 12px 12px 0 0;
 }
 
 .ort-card-body {
@@ -172,6 +172,7 @@ watch(() => route.query, async (q) => {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .ort-title {
@@ -179,6 +180,8 @@ watch(() => route.query, async (q) => {
   font-weight: bold;
   font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
   color: #1E293B;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .ort-address,
@@ -186,6 +189,8 @@ watch(() => route.query, async (q) => {
   font-size: 12px;
   color: #64748B;
   font-family: "Arial", sans-serif;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .keine-ergebnisse {
@@ -211,6 +216,7 @@ watch(() => route.query, async (q) => {
 
   .ort-card {
     max-width: 100%;
+    flex-basis: 100%;
   }
 }
 </style>

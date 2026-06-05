@@ -3,7 +3,13 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import NavBar from '../components/NavBar.vue'
 
-const { getAccessTokenSilently } = useAuth0()
+const { getAccessTokenSilently, logout } = useAuth0()
+
+function handleLogout() {
+  logout({ logoutParams: { returnTo: window.location.origin + import.meta.env.BASE_URL } })
+}
+
+
 const API = import.meta.env.VITE_API_BASE_URL
 
 const vorname = ref('')
@@ -265,6 +271,8 @@ onMounted(loadProfile)
           </button>
         </form>
       </div>
+
+      <button class="btn-logout" @click="handleLogout">Abmelden</button>
 
     </div>
   </main>
@@ -529,5 +537,22 @@ onMounted(loadProfile)
 
 .trainer-link a:hover {
   text-decoration: underline;
+}
+
+.btn-logout {
+  width: 100%;
+  padding: 12px;
+  background: #C00000;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-logout:hover {
+  background: #A00000;
 }
 </style>

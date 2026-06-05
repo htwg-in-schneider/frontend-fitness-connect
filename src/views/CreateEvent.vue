@@ -71,7 +71,6 @@ async function submit() {
     anzahlPlaetze: anzahlPlaetze.value,
     emoji: selectedEmoji.value,
     ersteller: String(me.id),
-    anzahlAnmeldungen: 0,
     typ,
     ort: { id: selectedOrtId.value },
   }

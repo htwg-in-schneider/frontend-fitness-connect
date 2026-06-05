@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useTrainerStore } from '../stores/trainer.js'
-import NavBar from '../components/NavBar.vue'
+import ListPage from '../components/ListPage.vue'
 import Button from '../components/Button.vue'
 import { Users, Star } from 'lucide-vue-next'
 
@@ -12,6 +12,10 @@ const trainerStore = useTrainerStore()
 
 const eingabe = ref(route.query.suche ?? '')
 const art = ref(route.query.art ?? '')
+
+const filterOptions = computed(() =>
+  trainerStore.arten.map(a => ({ value: a, label: a }))
+)
 
 function suchen() {
   const q = eingabe.value.trim()
@@ -35,123 +39,34 @@ watch(() => route.query, async (q) => {
 </script>
 
 <template>
-  <NavBar />
+  <ListPage
+    title="Trainer"
+    placeholder="Trainer suchen…"
+    :filterOptions="filterOptions"
+    filterLabel="Alle Trainerarten"
+    emptyText="Keine Trainer gefunden."
+    :isEmpty="trainerStore.list.length === 0"
+    v-model:eingabe="eingabe"
+    v-model:filter="art"
+    @search="suchen"
+  >
+    <template #icon><Users :size="20" /></template>
 
-  <main class="main-content">
-    <div class="trainer-page">
-
-      <div class="search-header">
-        <h1 class="page-title"><Users :size="20" /> Trainer</h1>
-        <div class="search-row">
-          <input
-            v-model="eingabe"
-            class="search-input"
-            type="search"
-            placeholder="Trainer suchen…"
-            @keyup.enter="suchen"
-          />
-          <select v-model="art" class="filter-select">
-            <option value="">Alle Trainerarten</option>
-            <option v-for="a in trainerStore.arten" :key="a" :value="a">{{ a }}</option>
-          </select>
-          <Button @click="suchen">Suchen</Button>
-        </div>
+    <div class="trainer-card" v-for="t in trainerStore.list" :key="t.id">
+      <img :src="t.profilbild_pfad" :alt="t.name" class="trainer-image">
+      <div class="trainer-card-body">
+        <h3 class="trainer-name">{{ t.name }}</h3>
+        <p class="trainer-art">{{ t.trainerart }}</p>
+        <p class="trainer-rating"><Star :size="13" /> {{ t.bewertung }}</p>
+        <Button @click="router.push('/trainer/' + t.id)">Profil ansehen</Button>
       </div>
-
-      <div v-if="trainerStore.list.length === 0" class="keine-ergebnisse">
-        Keine Trainer gefunden.
-      </div>
-
-      <div class="trainer-grid">
-        <div class="trainer-card" v-for="t in trainerStore.list" :key="t.id">
-          <img :src="t.profilbild_pfad" :alt="t.name" class="trainer-image">
-          <div class="trainer-card-body">
-            <h3 class="trainer-name">{{ t.name }}</h3>
-            <p class="trainer-art">{{ t.trainerart }}</p>
-            <p class="trainer-rating"><Star :size="13" /> {{ t.bewertung }}</p>
-            <Button @click="$router.push('/trainer/' + t.id)">Profil ansehen</Button>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </main>
+  </ListPage>
 </template>
 
 <style scoped>
-.trainer-page {
-  padding: 32px 24px;
-  max-width: 1100px;
-}
-
-.search-header {
-  margin-bottom: 32px;
-}
-
-.page-title {
-  font-size: 22px;
-  font-weight: bold;
-  font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
-  color: #1E293B;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.search-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.search-input {
-  flex: 1;
-  max-width: 480px;
-  padding: 10px 14px;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  background: #F8FAFC;
-}
-
-.search-input:focus {
-  border-color: #3B82F6;
-  background: #fff;
-}
-
-.filter-select {
-  padding: 10px 12px;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  font-size: 14px;
-  background: #F8FAFC;
-  outline: none;
-  cursor: pointer;
-}
-
-.filter-select:focus {
-  border-color: #3B82F6;
-  background: #fff;
-}
-
-.keine-ergebnisse {
-  text-align: center;
-  color: #94A3B8;
-  padding: 40px 0;
-  font-size: 14px;
-}
-
-.trainer-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
 .trainer-card {
   flex: 1 1 280px;
-  max-width: 360px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
@@ -202,20 +117,6 @@ watch(() => route.query, async (q) => {
 }
 
 @media (max-width: 768px) {
-  .search-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-input,
-  .filter-select {
-    max-width: 100%;
-  }
-
-  .trainer-grid {
-    flex-direction: column;
-  }
-
   .trainer-card {
     max-width: 100%;
     flex-basis: 100%;

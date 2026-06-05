@@ -39,6 +39,7 @@ import NavBar from '../components/NavBar.vue'
 <style scoped>
 .legal-page {
     padding: 32px;
+    min-height: calc(100vh - 120px);
 }
 
 .legal-content {

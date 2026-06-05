@@ -1,12 +1,12 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useEventsStore } from '../stores/events.js'
 import { formatEventDate } from '../utils.js'
-import NavBar from '../components/NavBar.vue'
+import ListPage from '../components/ListPage.vue'
 import Button from '../components/Button.vue'
-import { Calendar, MapPin, Tag, Plus, List } from 'lucide-vue-next'
+import { Calendar, MapPin, Tag, Plus, List, ArrowRight } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,6 +15,10 @@ const eventsStore = useEventsStore()
 
 const eingabe = ref(route.query.suche ?? '')
 const sportart = ref(route.query.sportart ?? '')
+
+const filterOptions = computed(() =>
+  eventsStore.sportarten.map(s => ({ value: s, label: s }))
+)
 
 function suchen() {
   const q = eingabe.value.trim()
@@ -38,91 +42,52 @@ watch(() => route.query, async (q) => {
 </script>
 
 <template>
-  <NavBar />
+  <ListPage
+    title="Events & Kurse"
+    placeholder="Event finden…"
+    :filterOptions="filterOptions"
+    filterLabel="Alle Sportarten"
+    emptyText="Keine Events gefunden."
+    :isEmpty="eventsStore.list.length === 0"
+    v-model:eingabe="eingabe"
+    v-model:filter="sportart"
+    @search="suchen"
+  >
+    <template #icon><Calendar :size="20" /></template>
 
-  <main class="main-content">
-    <div class="events-page">
+    <template #actions>
+      <button v-if="isAuthenticated" class="add-btn" @click="router.push('/meine-events')" title="Meine Events">
+        <List :size="20" />
+      </button>
+      <button v-if="isAuthenticated" class="add-btn" @click="router.push('/event-erstellen')" title="Event erstellen">
+        <Plus :size="20" />
+      </button>
+    </template>
 
-      <div class="search-header">
-        <div class="title-row">
-          <h1 class="page-title"><Calendar :size="20" /> Events &amp; Kurse</h1>
-          <div class="title-actions" v-if="isAuthenticated">
-            <button class="add-btn" @click="router.push('/meine-events')" title="Meine Events">
-              <List :size="20" />
-            </button>
-            <button class="add-btn" @click="router.push('/event-erstellen')" title="Event erstellen">
-              <Plus :size="20" />
-            </button>
-          </div>
-        </div>
-        <div class="search-row">
-          <input
-            v-model="eingabe"
-            class="search-input"
-            type="search"
-            placeholder="Event finden…"
-            @keyup.enter="suchen"
-          />
-          <select v-model="sportart" class="filter-select">
-            <option value="">Alle Sportarten</option>
-            <option v-for="s in eventsStore.sportarten" :key="s" :value="s">{{ s }}</option>
-          </select>
-          <Button @click="suchen">Suchen</Button>
-        </div>
+    <div
+      class="event-card"
+      v-for="event in eventsStore.list"
+      :key="event.id"
+    >
+      <div class="event-card-header">
+        <span class="event-emoji">{{ event.emoji }}</span>
+        <span class="event-tag" :class="event.preis ? 'tag-price' : 'tag-free'">
+          {{ event.preis ? event.preis.toFixed(0) + ' €' : 'Kostenlos' }}
+        </span>
       </div>
-
-      <div v-if="eventsStore.list.length === 0" class="keine-ergebnisse">
-        Keine Events gefunden.
+      <div class="event-card-body">
+        <h3 class="event-title">{{ event.name }}</h3>
+        <p class="event-detail"><Tag :size="13" /> {{ event.sportart }}</p>
+        <p class="event-detail"><MapPin :size="13" /> {{ event.ort?.name }}</p>
+        <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
+        <p class="event-spots">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }}/{{ event.anzahlPlaetze }} Plätze frei</p>
+        <Button @click="router.push('/event/' + event.id)">Ansehen</Button>
       </div>
-
-      <div class="events-grid">
-        <div
-          class="event-card"
-          v-for="event in eventsStore.list"
-          :key="event.id"
-        >
-          <div class="event-card-header">
-            <span class="event-emoji">{{ event.emoji }}</span>
-            <span class="event-tag" :class="event.preis ? 'tag-price' : 'tag-free'">
-              {{ event.preis ? event.preis.toFixed(0) + ' €' : 'Kostenlos' }}
-            </span>
-          </div>
-          <div class="event-card-body">
-            <h3 class="event-title">{{ event.name }}</h3>
-            <p class="event-detail"><Tag :size="13" /> {{ event.sportart }}</p>
-            <p class="event-detail"><MapPin :size="13" /> {{ event.ort?.name }}</p>
-            <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
-            <p class="event-spots">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }}/{{ event.anzahlPlaetze }} Plätze frei</p>
-            <Button @click="router.push('/event/' + event.id)">Ansehen</Button>
-          </div>
-        </div>
-      </div>
-
     </div>
-  </main>
+  </ListPage>
 </template>
 
 <style scoped>
-.events-page {
-  padding: 32px 24px;
-  max-width: 1100px;
-}
-
-.search-header {
-  margin-bottom: 32px;
-}
-
-.title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.title-actions {
-  display: flex;
-  gap: 8px;
-}
-
 .add-btn {
   width: 36px;
   height: 36px;
@@ -141,60 +106,8 @@ watch(() => route.query, async (q) => {
   background: #A00000;
 }
 
-.page-title {
-  font-size: 22px;
-  font-weight: bold;
-  font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
-  color: #1E293B;
-  margin-bottom: 16px;
-}
-
-.search-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.search-input {
-  flex: 1;
-  max-width: 480px;
-  padding: 10px 14px;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  background: #F8FAFC;
-}
-
-.search-input:focus {
-  border-color: #3B82F6;
-  background: #fff;
-}
-
-.filter-select {
-  padding: 10px 12px;
-  border: 1px solid #CBD5E1;
-  border-radius: 8px;
-  font-size: 14px;
-  background: #F8FAFC;
-  outline: none;
-  cursor: pointer;
-}
-
-.filter-select:focus {
-  border-color: #3B82F6;
-  background: #fff;
-}
-
-.events-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
 .event-card {
   flex: 1 1 260px;
-  max-width: 360px;
   background: #fff;
   border-radius: 12px;
   overflow: hidden;
@@ -262,27 +175,7 @@ watch(() => route.query, async (q) => {
   margin-bottom: 6px;
 }
 
-.keine-ergebnisse {
-  color: #64748B;
-  font-size: 14px;
-  padding: 24px 0;
-}
-
 @media (max-width: 600px) {
-  .search-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-input,
-  .filter-select {
-    max-width: 100%;
-  }
-
-  .events-grid {
-    flex-direction: column;
-  }
-
   .event-card {
     max-width: 100%;
   }

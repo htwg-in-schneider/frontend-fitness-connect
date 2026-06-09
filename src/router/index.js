@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useAuth0 } from '@auth0/auth0-vue'
+import { authGuard } from '@auth0/auth0-vue'
 import Dashboard from '../views/Dashboard.vue'
 import EventDetail from '../views/EventDetail.vue'
 import EventsView from '../views/EventsView.vue'
@@ -17,8 +17,6 @@ import ImpressumView from '../views/ImpressumView.vue'
 import DatenschutzView from '../views/DatenschutzView.vue'
 import AdminDashboard from '../views/AdminDashboard.vue'
 
-const publicPaths = ['/', '/impressum', '/datenschutz']
-
 const routes = [
   { path: '/', component: Dashboard },
   { path: '/events', component: EventsView },
@@ -27,15 +25,15 @@ const routes = [
   { path: '/event/:id', component: EventDetail },
   { path: '/trainer/:id', component: TrainerDetail },
   { path: '/ort/:id', component: OrtDetail },
-  { path: '/complete-profile', component: CompleteProfile },
-  { path: '/become-trainer', component: BecomeTrainer },
-  { path: '/event-erstellen', component: CreateEvent },
-  { path: '/meine-events', component: MeineEvents },
-  { path: '/event-bearbeiten/:id', component: EditEvent },
-  { path: '/profil', component: MeinProfil },
+  { path: '/complete-profile', component: CompleteProfile, beforeEnter: authGuard },
+  { path: '/become-trainer', component: BecomeTrainer, beforeEnter: authGuard },
+  { path: '/event-erstellen', component: CreateEvent, beforeEnter: authGuard },
+  { path: '/meine-events', component: MeineEvents, beforeEnter: authGuard },
+  { path: '/event-bearbeiten/:id', component: EditEvent, beforeEnter: authGuard },
+  { path: '/profil', component: MeinProfil, beforeEnter: authGuard },
   { path: '/impressum', component: ImpressumView },
   { path: '/datenschutz', component: DatenschutzView },
-  { path: '/admin', component: AdminDashboard },
+  { path: '/admin', component: AdminDashboard, beforeEnter: authGuard },
 ]
 
 // import.meta.env.BASE_URL picks up the `base` from vite.config.js
@@ -43,13 +41,6 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
-
-router.beforeEach((to) => {
-  const { isAuthenticated } = useAuth0()
-  if (!publicPaths.includes(to.path) && !isAuthenticated.value) {
-    return '/'
-  }
 })
 
 export default router

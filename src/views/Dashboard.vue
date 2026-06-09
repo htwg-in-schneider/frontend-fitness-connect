@@ -23,6 +23,7 @@ const vorname = ref('')
 const nachname = ref('')
 const profilFarbe = ref('#EF4444')
 const trainerProfilbild = ref('')
+const rolle = ref('')
 
 const initialen = computed(() => {
   const v = vorname.value?.trim()
@@ -41,6 +42,7 @@ async function loadProfile() {
       vorname.value = data.vorname
       nachname.value = data.nachname
       profilFarbe.value = data.profilFarbe || '#EF4444'
+      rolle.value = data.rolle
     }
     const trainerRes = await fetch(`${API}/api/nutzer/me/trainer`, {
       headers: { 'Authorization': `Bearer ${token}` },

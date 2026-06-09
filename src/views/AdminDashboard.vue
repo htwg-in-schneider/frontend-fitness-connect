@@ -27,6 +27,7 @@ const tabs = [
   { key: 'orte', label: 'Orte' },
   { key: 'nutzer', label: 'Nutzer' },
   { key: 'anmeldungen', label: 'Anmeldungen' },
+  { key: 'bewerbungen', label: 'Bewerbungen' },
 ]
 
 onMounted(async () => {
@@ -41,6 +42,7 @@ async function loadTab(tab) {
   else if (tab === 'orte') await admin.fetchOrte()
   else if (tab === 'nutzer') await admin.fetchNutzer()
   else if (tab === 'anmeldungen') await admin.fetchAnmeldungen()
+  else if (tab === 'bewerbungen') await admin.fetchBewerbungen()
 }
 
 // Filtered lists
@@ -143,6 +145,24 @@ function formatDate(ts) {
   if (!ts) return '-'
   const d = new Date(ts)
   return d.toLocaleString('de-DE')
+}
+
+async function handleAnnehmen(id) {
+  error.value = ''
+  try {
+    await admin.bewerbungAnnehmen(id)
+  } catch (e) {
+    error.value = e.message
+  }
+}
+
+async function handleAblehnen(id) {
+  error.value = ''
+  try {
+    await admin.bewerbungAblehnen(id)
+  } catch (e) {
+    error.value = e.message
+  }
 }
 </script>
 
@@ -289,6 +309,34 @@ function formatDate(ts) {
         </table>
       </div>
 
+      <!-- Bewerbungen Tab -->
+      <div v-if="activeTab === 'bewerbungen'" class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Vorname</th>
+              <th>Nachname</th>
+              <th>Email</th>
+              <th>Aktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="b in admin.bewerbungen" :key="b.id">
+              <td>{{ b.id }}</td>
+              <td>{{ b.vorname }}</td>
+              <td>{{ b.nachname }}</td>
+              <td>{{ b.email }}</td>
+              <td class="actions">
+                <button class="btn-edit" @click="handleAnnehmen(b.id)">Annehmen</button>
+                <button class="btn-del" @click="handleAblehnen(b.id)">Ablehnen</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p v-if="admin.bewerbungen.length === 0" style="color:#64748B;font-size:13px;margin-top:12px;">Keine offenen Bewerbungen.</p>
+      </div>
+
       <!-- Modal -->
     </template>
   </div>
@@ -331,7 +379,6 @@ function formatDate(ts) {
           <label>Rolle
             <select v-model="modalData.rolle">
               <option value="USER">USER</option>
-              <option value="TRAINER">TRAINER</option>
               <option value="ADMIN">ADMIN</option>
             </select>
           </label>

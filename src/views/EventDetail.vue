@@ -79,6 +79,20 @@ async function beitreten() {
   } catch (_) {}
 }
 
+async function abmelden() {
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch(`${API}/api/anmeldungen/${route.params.id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (res.ok) {
+      bereitsAngemeldet.value = false
+      await eventsStore.search({})
+    }
+  } catch (_) {}
+}
+
 function renderStars(rating) {
   const full = Math.floor(rating)
   const half = rating - full >= 0.5
@@ -161,7 +175,10 @@ function renderStars(rating) {
           </div>
         </div>
 
-        <Button v-if="bereitsAngemeldet" variant="secondary" :disabled="true">Bereits angemeldet</Button>
+        <div v-if="bereitsAngemeldet" class="anmeldung-actions">
+          <Button variant="secondary" :disabled="true">Bereits angemeldet</Button>
+          <Button variant="danger" @click="abmelden">Abmelden</Button>
+        </div>
         <Button v-else :disabled="istVoll" @click="handleTeilnehmen">
           {{ istVoll ? 'Ausgebucht' : 'Jetzt bezahlen' }}
         </Button>
@@ -203,7 +220,10 @@ function renderStars(rating) {
           </div>
         </div>
 
-        <Button v-if="bereitsAngemeldet" variant="secondary" :disabled="true">Bereits angemeldet</Button>
+        <div v-if="bereitsAngemeldet" class="anmeldung-actions">
+          <Button variant="secondary" :disabled="true">Bereits angemeldet</Button>
+          <Button variant="danger" @click="abmelden">Abmelden</Button>
+        </div>
         <Button v-else :disabled="istVoll" @click="handleTeilnehmen">
           {{ istVoll ? 'Ausgebucht' : 'Teilnehmen' }}
         </Button>
@@ -231,6 +251,11 @@ function renderStars(rating) {
 </template>
 
 <style scoped>
+.anmeldung-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .detail-page {
   max-width: 1000px;
   padding: 0 16px 40px;

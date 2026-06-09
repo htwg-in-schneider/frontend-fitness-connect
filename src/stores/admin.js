@@ -12,6 +12,7 @@ export const useAdminStore = defineStore('admin', {
     orte: [],
     nutzer: [],
     anmeldungen: [],
+    bewerbungen: [],
   }),
   actions: {
     setTokenGetter(fn) {
@@ -158,6 +159,31 @@ export const useAdminStore = defineStore('admin', {
       })
       if (!res.ok) throw new Error('Fehler beim Löschen')
       await this.fetchAnmeldungen()
+    },
+    async fetchBewerbungen() {
+      const token = await this.getToken()
+      const res = await fetch(`${API}/api/admin/bewerbungen`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (res.ok) this.bewerbungen = await res.json()
+    },
+    async bewerbungAnnehmen(id) {
+      const token = await this.getToken()
+      const res = await fetch(`${API}/api/admin/bewerbungen/${id}/annehmen`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (!res.ok) { const msg = await res.text(); throw new Error(msg || 'Fehler') }
+      await this.fetchBewerbungen()
+    },
+    async bewerbungAblehnen(id) {
+      const token = await this.getToken()
+      const res = await fetch(`${API}/api/admin/bewerbungen/${id}/ablehnen`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (!res.ok) { const msg = await res.text(); throw new Error(msg || 'Fehler') }
+      await this.fetchBewerbungen()
     },
   },
 })

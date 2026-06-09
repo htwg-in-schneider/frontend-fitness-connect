@@ -37,7 +37,7 @@ function handleLogout() {
             <li @click="router.push('/')"><NavButton icon="LayoutDashboard" label="Dashboard" :active="route.path === '/'"/></li>
             <li v-if="isAuthenticated" @click="router.push('/events')"><NavButton icon="Calendar" label="Events / Kurse" :active="route.path === '/events'" /></li>
             <li v-if="isAuthenticated" @click="router.push('/orte')"><NavButton icon="MapPin" label="Sportanlagen" :active="route.path === '/orte'" /></li>
-            <li v-if="isAuthenticated" @click="router.push('/trainer')"><NavButton icon="Users" label="Trainer" :active="route.path === '/trainer'" /></li>
+            <li v-if="isAuthenticated" @click="router.push('/meine-events')"><NavButton icon="Star" label="Meins" :active="route.path === '/meine-events'" /></li>
             <li v-if="isAuthenticated" @click="router.push('/profil')"><NavButton icon="User" label="Mein Profil" :active="route.path === '/profil'" /></li>
             <li v-if="showAdmin" @click="router.push('/admin')"><NavButton icon="Shield" label="Admin" :active="route.path === '/admin'" /></li>
         </ul>

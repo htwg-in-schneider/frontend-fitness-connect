@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useAdminStore } from '../stores/admin.js'
-import { LayoutDashboard, Calendar, MapPin, Users, User, Shield } from 'lucide-vue-next'
+import { LayoutDashboard, Calendar, MapPin, Star, User, Shield } from 'lucide-vue-next'
 
 const router = useRouter()
 const route = useRoute()
@@ -19,7 +19,7 @@ watch(isAuthenticated, async (auth) => {
   }
 }, { immediate: true })
 
-const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User, Shield }
+const iconMap = { LayoutDashboard, Calendar, MapPin, Star, User, Shield }
 </script>
 
 <template>
@@ -36,9 +36,9 @@ const iconMap = { LayoutDashboard, Calendar, MapPin, Users, User, Shield }
       <component :is="iconMap.MapPin" :size="22" />
       <span class="mobile-nav-label">Sportanlagen</span>
     </button>
-    <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/trainer' }" @click="router.push('/trainer')">
-      <component :is="iconMap.Users" :size="22" />
-      <span class="mobile-nav-label">Trainer</span>
+    <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/meine-events' }" @click="router.push('/meine-events')">
+      <component :is="iconMap.Star" :size="22" />
+      <span class="mobile-nav-label">Meins</span>
     </button>
     <button v-if="isAuthenticated" class="mobile-nav-item" :class="{ active: route.path === '/profil' }" @click="router.push('/profil')">
       <component :is="iconMap.User" :size="22" />

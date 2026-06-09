@@ -95,9 +95,9 @@ watch(isAuthenticated, (authenticated) => {
 
         <HeroSection />
         <p v-if="eventsStore.error" class="fetch-error">⚠️ {{ eventsStore.error }}</p>
-        <EventsSection v-else :events="eventsStore.list" />
+        <EventsSection v-else :events="eventsStore.list.slice(0, 4)" />
         <p v-if="orteStore.error" class="fetch-error">⚠️ {{ orteStore.error }}</p>
-        <OrteSection v-else :orte="orteStore.list" />
+        <OrteSection v-else :orte="orteStore.list.slice(0, 4)" />
         <p v-if="trainerStore.error" class="fetch-error">⚠️ {{ trainerStore.error }}</p>
         <TrainerSection v-else :trainer="trainerStore.list" />
         <ContactSection />

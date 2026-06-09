@@ -2,10 +2,12 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useAuth0 } from '@auth0/auth0-vue'
 import { useAdminStore } from '../stores/admin.js'
+import { useOrteStore } from '../stores/orte.js'
 import NavBar from '../components/NavBar.vue'
 
 const { getAccessTokenSilently } = useAuth0()
 const admin = useAdminStore()
+const orteStore = useOrteStore()
 admin.setTokenGetter(getAccessTokenSilently)
 
 const activeTab = ref('events')
@@ -32,7 +34,10 @@ const tabs = [
 
 onMounted(async () => {
   await admin.checkAdmin()
-  if (admin.isAdmin) loadTab('events')
+  if (admin.isAdmin) {
+    loadTab('events')
+    orteStore.fetchAll()
+  }
 })
 
 async function loadTab(tab) {
@@ -85,6 +90,12 @@ function openEdit(item, type) {
   if (type === 'event' && modalData.zeit) {
     modalData.zeit = modalData.zeit.substring(0, 16)
   }
+  if (type === 'event') {
+    if (!modalData.typ) {
+      modalData.typ = modalData.preis !== undefined && modalData.preis !== null ? 'KURS' : 'EVENT'
+    }
+    modalData.selectedOrtId = modalData.ort?.id || null
+  }
   showModal.value = true
   error.value = ''
 }
@@ -95,7 +106,7 @@ function openCreate(type) {
   modalId.value = null
   Object.keys(modalData).forEach(k => delete modalData[k])
   if (type === 'event') {
-    Object.assign(modalData, { name: '', sportart: '', emoji: '', anzahlPlaetze: 10, zeit: '', ersteller: '', typ: 'EVENT' })
+    Object.assign(modalData, { name: '', sportart: '', emoji: '⚽', anzahlPlaetze: 10, zeit: '', ersteller: '', typ: 'EVENT', selectedOrtId: null, preis: 0 })
   } else if (type === 'ort') {
     Object.assign(modalData, { name: '', adresse: '', art: 'OUTDOOR', bildUrl: '' })
   } else if (type === 'anmeldung') {
@@ -103,6 +114,24 @@ function openCreate(type) {
   }
   showModal.value = true
   error.value = ''
+}
+
+function buildEventPayload() {
+  const zeit = modalData.zeit ? (modalData.zeit.length === 16 ? modalData.zeit + ':00' : modalData.zeit) : ''
+  const payload = {
+    name: modalData.name,
+    sportart: modalData.sportart,
+    emoji: modalData.emoji,
+    anzahlPlaetze: modalData.anzahlPlaetze,
+    zeit,
+    ersteller: String(modalData.ersteller),
+    typ: modalData.typ || 'EVENT',
+    ort: modalData.selectedOrtId ? { id: modalData.selectedOrtId } : (modalData.ort || null),
+  }
+  if (payload.typ === 'KURS') {
+    payload.preis = modalData.preis || 0
+  }
+  return payload
 }
 
 function closeModal() {
@@ -114,11 +143,11 @@ async function saveModal() {
   error.value = ''
   try {
     if (modalMode.value === 'edit') {
-      if (modalType.value === 'event') await admin.updateEvent(modalId.value, modalData)
+      if (modalType.value === 'event') await admin.updateEvent(modalId.value, buildEventPayload())
       else if (modalType.value === 'ort') await admin.updateOrt(modalId.value, modalData)
       else if (modalType.value === 'nutzer') await admin.updateNutzer(modalId.value, modalData)
     } else {
-      if (modalType.value === 'event') await admin.createEvent(modalData)
+      if (modalType.value === 'event') await admin.createEvent(buildEventPayload())
       else if (modalType.value === 'ort') await admin.createOrt(modalData)
       else if (modalType.value === 'anmeldung') await admin.createAnmeldung({ nutzerId: Number(modalData.nutzerId), eventId: Number(modalData.eventId) })
     }
@@ -350,13 +379,25 @@ async function handleAblehnen(id) {
 
         <!-- Event fields -->
         <template v-if="modalType === 'event'">
+          <label>Typ
+            <select v-model="modalData.typ">
+              <option value="EVENT">Event</option>
+              <option value="KURS">Kurs</option>
+            </select>
+          </label>
           <label>Name <input v-model="modalData.name" /></label>
           <label>Sportart <input v-model="modalData.sportart" /></label>
           <label>Emoji <input v-model="modalData.emoji" /></label>
           <label>Anzahl Plätze <input type="number" v-model.number="modalData.anzahlPlaetze" /></label>
           <label>Zeit <input type="datetime-local" v-model="modalData.zeit" /></label>
+          <label>Ort
+            <select v-model="modalData.selectedOrtId">
+              <option :value="null">– Kein Ort –</option>
+              <option v-for="ort in orteStore.list" :key="ort.id" :value="ort.id">{{ ort.name }}</option>
+            </select>
+          </label>
           <label>Ersteller (Nutzer-ID) <input v-model="modalData.ersteller" /></label>
-          <label v-if="modalData.preis !== undefined || modalMode === 'create'">Preis (leer = kein Kurs) <input type="number" step="0.01" v-model.number="modalData.preis" /></label>
+          <label v-if="modalData.typ === 'KURS'">Preis <input type="number" step="0.01" v-model.number="modalData.preis" /></label>
         </template>
 
         <!-- Ort fields -->

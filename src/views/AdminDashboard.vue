@@ -161,7 +161,6 @@ async function saveModal() {
 }
 
 async function handleDelete(type, id) {
-  if (!confirm('Wirklich löschen?')) return
   error.value = ''
   try {
     if (type === 'event') await admin.deleteEvent(id)

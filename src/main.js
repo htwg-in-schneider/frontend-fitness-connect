@@ -15,6 +15,8 @@ createApp(App)
     authorizationParams: {
       redirect_uri: window.location.origin + window.location.pathname,
       audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-    }
+    },
+    cacheLocation: 'localstorage',
+    useRefreshTokens: true,
   }))
   .mount('#app')

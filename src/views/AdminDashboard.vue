@@ -536,9 +536,12 @@ function statusClass(s) {
 <style scoped>
 .admin-wrap {
   padding: 24px 32px;
+  width: 100%;
   max-width: 1400px;
+  box-sizing: border-box;
   margin: 0 auto;
   min-height: calc(100vh - 120px);
+  overflow-x: hidden;
 }
 .admin-denied {
   text-align: center;
@@ -557,7 +560,11 @@ function statusClass(s) {
   gap: 4px;
   margin-bottom: 16px;
   border-bottom: 2px solid #E2E8F0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
+.admin-tabs::-webkit-scrollbar { height: 4px; }
 .tab-btn {
   padding: 8px 18px;
   border: none;
@@ -594,9 +601,16 @@ function statusClass(s) {
   cursor: pointer;
 }
 .btn-create:hover { background: #334155; }
-.admin-table-wrap { overflow-x: auto; }
-.admin-table {
+.admin-table-wrap {
   width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.admin-table {
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -663,7 +677,11 @@ function statusClass(s) {
 .btn-audit-toggle:hover { background: #E2E8F0; }
 .audit-logs-wrap {
   margin-top: 10px;
+  width: 100%;
+  max-width: 100%;
   overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 .audit-table .audit-userid {
   max-width: 120px;
@@ -727,4 +745,10 @@ function statusClass(s) {
   border: 1px solid #E2E8F0; border-radius: 4px; font-size: 12px; cursor: pointer;
 }
 .btn-cancel:hover { background: #E2E8F0; }
+
+@media (max-width: 768px) {
+  .admin-wrap {
+    padding: 18px 16px;
+  }
+}
 </style>

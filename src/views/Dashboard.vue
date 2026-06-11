@@ -162,6 +162,16 @@ watch(isAuthenticated, (authenticated) => {
 .create-event-btn:hover {
     background: #A00000;
 }
+
+.main-content {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.content-header {
+    padding-top: 28px;
+    padding-bottom: 8px;
+}
 </style>
 
 <style scoped></style>

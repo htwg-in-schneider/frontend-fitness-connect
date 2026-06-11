@@ -17,6 +17,8 @@ const modalMode = ref('edit') // 'edit' or 'create'
 const modalType = ref('')
 const modalData = reactive({})
 const modalId = ref(null)
+const showAuditLogs = ref(false)
+const auditLogsLoading = ref(false)
 
 // Search filters per tab
 const searchEvents = reactive({ name: '', sportart: '', ersteller: '' })
@@ -43,6 +45,7 @@ onMounted(async () => {
 async function loadTab(tab) {
   activeTab.value = tab
   error.value = ''
+  showAuditLogs.value = false
   if (tab === 'events') await admin.fetchEvents()
   else if (tab === 'orte') await admin.fetchOrte()
   else if (tab === 'nutzer') await admin.fetchNutzer()
@@ -192,6 +195,27 @@ async function handleAblehnen(id) {
   } catch (e) {
     error.value = e.message
   }
+}
+
+const tabEntityType = { events: 'Event', orte: 'Ort', nutzer: 'Nutzer', anmeldungen: 'Anmeldung' }
+
+async function toggleAuditLogs() {
+  if (showAuditLogs.value) {
+    showAuditLogs.value = false
+    return
+  }
+  const entityType = tabEntityType[activeTab.value]
+  if (!entityType) return
+  auditLogsLoading.value = true
+  await admin.fetchAuditLogs(entityType)
+  auditLogsLoading.value = false
+  showAuditLogs.value = true
+}
+
+function statusLabel(s) {
+  if (s === 'SUCCESS') return '✅ Erfolg'
+  if (s === 'FAILURE') return '❌ Fehlgeschlagen'
+  return '⏳ Wird ausgeführt'
 }
 </script>
 
@@ -364,6 +388,41 @@ async function handleAblehnen(id) {
           </tbody>
         </table>
         <p v-if="admin.bewerbungen.length === 0" style="color:#64748B;font-size:13px;margin-top:12px;">Keine offenen Bewerbungen.</p>
+      </div>
+
+      <!-- Audit Logs Toggle -->
+      <div v-if="activeTab !== 'bewerbungen'" class="audit-section">
+        <button class="btn-audit-toggle" @click="toggleAuditLogs">
+          {{ showAuditLogs ? '▾ Audit Logs ausblenden' : '▸ Audit Logs anzeigen' }}
+        </button>
+        <div v-if="auditLogsLoading" style="color:#64748B;font-size:12px;margin-top:8px;">Lade...</div>
+        <div v-if="showAuditLogs && !auditLogsLoading" class="audit-logs-wrap">
+          <table v-if="admin.auditLogs.length" class="admin-table audit-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Zeitpunkt</th>
+                <th>Nutzer</th>
+                <th>Aktion</th>
+                <th>Entity Type</th>
+                <th>Entity ID</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="log in admin.auditLogs" :key="log.id">
+                <td>{{ log.id }}</td>
+                <td>{{ formatDate(log.timestamp) }}</td>
+                <td class="audit-userid">{{ log.nutzer ? (log.nutzer.vorname + ' ' + log.nutzer.nachname) : '-' }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.entityType }}</td>
+                <td>{{ log.entityId ?? '-' }}</td>
+                <td>{{ statusLabel(log.status) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p v-else style="color:#64748B;font-size:12px;margin-top:8px;">Keine Audit Logs vorhanden.</p>
+        </div>
       </div>
 
       <!-- Modal -->
@@ -553,6 +612,31 @@ async function handleAblehnen(id) {
   border: none; border-radius: 3px; cursor: pointer;
 }
 .btn-del:hover { background: #B91C1C; }
+.audit-section {
+  margin-top: 20px;
+  border-top: 1px solid #E2E8F0;
+  padding-top: 12px;
+}
+.btn-audit-toggle {
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.btn-audit-toggle:hover { background: #E2E8F0; }
+.audit-logs-wrap {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+.audit-table .audit-userid {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 </style>
 
 <style>

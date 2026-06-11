@@ -13,6 +13,7 @@ export const useAdminStore = defineStore('admin', {
     nutzer: [],
     anmeldungen: [],
     bewerbungen: [],
+    auditLogs: [],
   }),
   actions: {
     setTokenGetter(fn) {
@@ -184,6 +185,14 @@ export const useAdminStore = defineStore('admin', {
       })
       if (!res.ok) { const msg = await res.text(); throw new Error(msg || 'Fehler') }
       await this.fetchBewerbungen()
+    },
+    async fetchAuditLogs(entityType) {
+      const token = await this.getToken()
+      const res = await fetch(`${API}/api/admin/audit-logs?entityType=${encodeURIComponent(entityType)}`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      })
+      if (res.ok) this.auditLogs = await res.json()
+      else this.auditLogs = []
     },
   },
 })

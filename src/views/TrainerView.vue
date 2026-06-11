@@ -6,16 +6,35 @@ import ListPage from '../components/ListPage.vue'
 import Button from '../components/Button.vue'
 import { Users, Star } from 'lucide-vue-next'
 
+const API = import.meta.env.VITE_API_BASE_URL
+
 const route = useRoute()
 const router = useRouter()
-const trainerStore = useTrainerStore()
+
+const list = ref([])
+const arten = ref([])
 
 const eingabe = ref(route.query.suche ?? '')
 const art = ref(route.query.art ?? '')
 
 const filterOptions = computed(() =>
-  trainerStore.arten.map(a => ({ value: a, label: a }))
+  arten.value.map(a => ({ value: a, label: a }))
 )
+
+async function fetchArten() {
+  const res = await fetch(`${API}/api/trainer/arten`)
+  arten.value = await res.json()
+}
+
+async function search({ suche = '', art: artVal = '' } = {}) {
+  const params = new URLSearchParams()
+  if (suche) params.set('suche', suche)
+  if (artVal) params.set('art', artVal)
+  const qs = params.toString()
+  const res = await fetch(`${API}/api/trainer${qs ? '?' + qs : ''}`)
+  const data = await res.json()
+  list.value = data.map(t => ({ ...t, profilbild_pfad: t.profilbildUrl }))
+}
 
 function suchen() {
   const q = eingabe.value.trim()

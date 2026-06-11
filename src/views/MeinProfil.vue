@@ -191,7 +191,7 @@ onMounted(loadProfile)
           </label>
           <label>
             <span class="field-label">E-Mail</span>
-            <input v-model="email" type="email" required placeholder="E-Mail-Adresse" />
+            <input v-model="email" type="email" required placeholder="E-Mail-Adresse" disabled style="color: grey;" />
           </label>
 
           <div class="color-section">

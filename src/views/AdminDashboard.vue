@@ -175,7 +175,12 @@ async function handleDelete(type, id) {
 
 function formatDate(ts) {
   if (!ts) return '-'
+  if (Array.isArray(ts)) {
+    const [y, m, d, h = 0, min = 0, s = 0] = ts
+    return new Date(y, m - 1, d, h, min, s).toLocaleString('de-DE')
+  }
   const d = new Date(ts)
+  if (isNaN(d.getTime())) return '-'
   return d.toLocaleString('de-DE')
 }
 

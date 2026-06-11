@@ -144,6 +144,30 @@ function closeModal() {
 
 async function saveModal() {
   error.value = ''
+  // Validation
+  if (modalType.value === 'event') {
+    if (!modalData.name?.trim()) { error.value = 'Name ist erforderlich.'; return }
+    if (!modalData.sportart?.trim()) { error.value = 'Sportart ist erforderlich.'; return }
+    if (!modalData.zeit) { error.value = 'Zeit ist erforderlich.'; return }
+    if (!modalData.anzahlPlaetze || modalData.anzahlPlaetze < 1) { error.value = 'Anzahl Plätze muss mindestens 1 sein.'; return }
+    if (!String(modalData.ersteller ?? '').trim()) { error.value = 'Ersteller-ID ist erforderlich.'; return }
+    if (modalData.typ === 'KURS' && (modalData.preis == null || modalData.preis < 0)) { error.value = 'Preis darf nicht negativ sein.'; return }
+  }
+  if (modalType.value === 'ort') {
+    if (!modalData.name?.trim()) { error.value = 'Name ist erforderlich.'; return }
+    if (!modalData.adresse?.trim()) { error.value = 'Adresse ist erforderlich.'; return }
+    if (!modalData.bildUrl?.trim()) { error.value = 'Bild URL ist erforderlich.'; return }
+    if (modalData.bildUrl.length > 255) { error.value = 'Bild URL darf maximal 255 Zeichen lang sein.'; return }
+  }
+  if (modalType.value === 'nutzer') {
+    if (!modalData.vorname?.trim()) { error.value = 'Vorname ist erforderlich.'; return }
+    if (!modalData.nachname?.trim()) { error.value = 'Nachname ist erforderlich.'; return }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(modalData.email || '')) { error.value = 'Bitte eine gültige E-Mail-Adresse eingeben.'; return }
+  }
+  if (modalType.value === 'anmeldung') {
+    if (!modalData.nutzerId || modalData.nutzerId < 1) { error.value = 'Nutzer-ID ist erforderlich (min. 1).'; return }
+    if (!modalData.eventId || modalData.eventId < 1) { error.value = 'Event-ID ist erforderlich (min. 1).'; return }
+  }
   try {
     if (modalMode.value === 'edit') {
       if (modalType.value === 'event') await admin.updateEvent(modalId.value, buildEventPayload())
@@ -453,38 +477,38 @@ function statusClass(s) {
               <option value="KURS">Kurs</option>
             </select>
           </label>
-          <label>Name <input v-model="modalData.name" /></label>
-          <label>Sportart <input v-model="modalData.sportart" /></label>
+          <label>Name <input v-model="modalData.name" required /></label>
+          <label>Sportart <input v-model="modalData.sportart" required /></label>
           <label>Emoji <input v-model="modalData.emoji" /></label>
-          <label>Anzahl Plätze <input type="number" v-model.number="modalData.anzahlPlaetze" /></label>
-          <label>Zeit <input type="datetime-local" v-model="modalData.zeit" /></label>
+          <label>Anzahl Plätze <input type="number" min="1" v-model.number="modalData.anzahlPlaetze" required /></label>
+          <label>Zeit <input type="datetime-local" v-model="modalData.zeit" required /></label>
           <label>Ort
             <select v-model="modalData.selectedOrtId">
               <option :value="null">– Kein Ort –</option>
               <option v-for="ort in orteStore.list" :key="ort.id" :value="ort.id">{{ ort.name }}</option>
             </select>
           </label>
-          <label>Ersteller (Nutzer-ID) <input v-model="modalData.ersteller" /></label>
-          <label v-if="modalData.typ === 'KURS'">Preis <input type="number" step="0.01" v-model.number="modalData.preis" /></label>
+          <label>Ersteller (Nutzer-ID) <input v-model="modalData.ersteller" required /></label>
+          <label v-if="modalData.typ === 'KURS'">Preis <input type="number" step="0.01" min="0" v-model.number="modalData.preis" required /></label>
         </template>
 
         <!-- Ort fields -->
         <template v-if="modalType === 'ort'">
-          <label>Name <input v-model="modalData.name" /></label>
-          <label>Adresse <input v-model="modalData.adresse" /></label>
+          <label>Name <input v-model="modalData.name" required /></label>
+          <label>Adresse <input v-model="modalData.adresse" required /></label>
           <label>Art
             <select v-model="modalData.art">
               <option v-for="a in ['FITNESSSTUDIO','OUTDOOR','SPORTPLATZ','FUSSBALLPLATZ','WIESE','FAHRRADSTRECKE','LAUFSTRECKE','TURNHALLE']" :key="a" :value="a">{{ a }}</option>
             </select>
           </label>
-          <label>Bild URL <input v-model="modalData.bildUrl" /></label>
+          <label>Bild URL <input v-model="modalData.bildUrl" required maxlength="255" /></label>
         </template>
 
         <!-- Nutzer fields (edit only) -->
         <template v-if="modalType === 'nutzer'">
-          <label>Vorname <input v-model="modalData.vorname" /></label>
-          <label>Nachname <input v-model="modalData.nachname" /></label>
-          <label>Email <input v-model="modalData.email" /></label>
+          <label>Vorname <input v-model="modalData.vorname" required /></label>
+          <label>Nachname <input v-model="modalData.nachname" required /></label>
+          <label>Email <input type="email" v-model="modalData.email" required disabled/></label>
           <label>Rolle
             <select v-model="modalData.rolle">
               <option value="USER">USER</option>
@@ -496,8 +520,8 @@ function statusClass(s) {
 
         <!-- Anmeldung fields (create only) -->
         <template v-if="modalType === 'anmeldung'">
-          <label>Nutzer-ID <input type="number" v-model.number="modalData.nutzerId" /></label>
-          <label>Event-ID <input type="number" v-model.number="modalData.eventId" /></label>
+          <label>Nutzer-ID <input type="number" min="1" v-model.number="modalData.nutzerId" required /></label>
+          <label>Event-ID <input type="number" min="1" v-model.number="modalData.eventId" required /></label>
         </template>
 
         <div class="modal-actions">

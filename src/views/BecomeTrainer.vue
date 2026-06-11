@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
 
@@ -24,10 +24,34 @@ const profilbilder = [
   'https://htwg-in-schneider.github.io/frontend-static-fitness-connect/TrainerImages/AlidaW.png',
 ]
 
+const ibanRegex = /^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/
+const bicRegex = /^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/
+const telRegex = /^\+?[0-9][0-9\s\-().]{6,19}$/
+
+const ibanGueltig = computed(() => ibanRegex.test(iban.value.toUpperCase().replace(/\s/g, '')))
+const bicGueltig = computed(() => bicRegex.test(bic.value.toUpperCase().replace(/\s/g, '')))
+const telefonnummerGueltig = computed(() => telRegex.test(telefonnummer.value.trim()))
+
 async function submit() {
   error.value = ''
   if (!profilbildUrl.value) {
     error.value = 'Bitte wähle ein Profilbild aus.'
+    return
+  }
+  if (!ibanGueltig.value) {
+    error.value = 'Ungültige IBAN (z. B. DE89370400440532013000).'
+    return
+  }
+  if (!bicGueltig.value) {
+    error.value = 'Ungültiger BIC (z. B. COBADEFFXXX).'
+    return
+  }
+  if (!telefonnummerGueltig.value) {
+    error.value = 'Bitte eine gültige Telefonnummer eingeben (z. B. +49 151 12345678).'
+    return
+  }
+  if (zitat.value.length > 500) {
+    error.value = 'Zitat darf maximal 500 Zeichen lang sein.'
     return
   }
   loading.value = true
@@ -42,9 +66,9 @@ async function submit() {
       body: JSON.stringify({
         trainerart: trainerart.value,
         kontoinhaber: kontoinhaber.value,
-        iban: iban.value,
-        bic: bic.value,
-        telefonnummer: telefonnummer.value,
+        iban: iban.value.toUpperCase().replace(/\s/g, ''),
+        bic: bic.value.toUpperCase().replace(/\s/g, ''),
+        telefonnummer: telefonnummer.value.trim(),
         zitat: zitat.value,
         profilbildUrl: profilbildUrl.value,
       }),
@@ -76,22 +100,25 @@ async function submit() {
           <span class="field-label">Kontoinhaber</span>
           <input v-model="kontoinhaber" type="text" required placeholder="Kontoinhaber" />
         </label>
-        <label>
+        <div class="field-group">
           <span class="field-label">IBAN</span>
-          <input v-model="iban" type="text" required placeholder="DE..." />
-        </label>
-        <label>
+          <input v-model="iban" type="text" required placeholder="DE89 3704 0044 0532 0130 00" />
+        </div>
+        <div class="field-group">
           <span class="field-label">BIC</span>
-          <input v-model="bic" type="text" required placeholder="BIC" />
-        </label>
-        <label>
+          <input v-model="bic" type="text" required placeholder="COBADEFFXXX" />
+        </div>
+        <div class="field-group">
           <span class="field-label">Telefonnummer</span>
-          <input v-model="telefonnummer" type="tel" required placeholder="+49..." />
-        </label>
-        <label>
-          <span class="field-label">Persönliches Zitat</span>
-          <textarea v-model="zitat" rows="3" placeholder="Ein persönliches Zitat…"></textarea>
-        </label>
+          <input v-model="telefonnummer" type="tel" required placeholder="+49 151 12345678" />
+        </div>
+        <div class="field-group">
+          <span class="field-label">
+            Persönliches Zitat
+            <span class="char-counter" :class="{ 'char-limit': zitat.length >= 480 }">{{ zitat.length }}/500</span>
+          </span>
+          <textarea v-model="zitat" rows="3" maxlength="500" placeholder="Ein persönliches Zitat…"></textarea>
+        </div>
         <div class="image-selection">
           <span class="field-label">Profilbild wählen</span>
           <div class="image-grid">
@@ -249,5 +276,22 @@ async function submit() {
 
 .btn-cancel:hover {
   background: #F1F5F9;
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.char-counter {
+  font-size: 11px;
+  color: #94A3B8;
+  font-weight: 400;
+  margin-left: 8px;
+}
+
+.char-limit {
+  color: #C00000;
 }
 </style>

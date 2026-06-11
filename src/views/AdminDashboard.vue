@@ -217,9 +217,14 @@ async function toggleAuditLogs() {
 }
 
 function statusLabel(s) {
-  if (s === 'SUCCESS') return '✅ Erfolg'
-  if (s === 'FAILURE') return '❌ Fehlgeschlagen'
-  return '⏳ Wird ausgeführt'
+  if (s === 'SUCCESS') return 'Erfolg'
+  if (s === 'FAILURE') return 'Fehlgeschlagen'
+  return 'Ausstehend'
+}
+function statusClass(s) {
+  if (s === 'SUCCESS') return 'status-badge status-success'
+  if (s === 'FAILURE') return 'status-badge status-failure'
+  return 'status-badge status-pending'
 }
 </script>
 
@@ -421,7 +426,7 @@ function statusLabel(s) {
                 <td>{{ log.action }}</td>
                 <td>{{ log.entityType }}</td>
                 <td>{{ log.entityId ?? '-' }}</td>
-                <td>{{ statusLabel(log.status) }}</td>
+                <td><span :class="statusClass(log.status)">{{ statusLabel(log.status) }}</span></td>
               </tr>
             </tbody>
           </table>
@@ -640,6 +645,26 @@ function statusLabel(s) {
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.status-success {
+  background: #DCFCE7;
+  color: #16A34A;
+}
+.status-failure {
+  background: #FEE2E2;
+  color: #DC2626;
+}
+.status-pending {
+  background: #FEF9C3;
+  color: #CA8A04;
 }
 </style>
 

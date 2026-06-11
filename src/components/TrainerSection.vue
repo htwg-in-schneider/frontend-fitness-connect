@@ -3,6 +3,7 @@ import { useRouter } from 'vue-router'
 import { useAuth0 } from '@auth0/auth0-vue'
 import Button from './Button.vue'
 import NavigationLink from './NavigationLink.vue'
+import { Star } from 'lucide-vue-next'
 
 const router = useRouter()
 const { isAuthenticated } = useAuth0()
@@ -35,7 +36,7 @@ function handleTrainerClick(trainerId) {
                 <div class="trainer-card-body">
                     <div>
                         <h3 class="trainer-name">{{ t.name }}</h3>
-                        <p class="trainer-detail">{{ t.trainerart }} · ⭐ {{ t.bewertung }}</p>
+                        <p class="trainer-detail">{{ t.trainerart }} · <Star :size="13" /> {{ t.bewertung }}</p>
                     </div>
                     <div>
                         <Button @click="handleTrainerClick(t.id)">Profil ansehen</Button>

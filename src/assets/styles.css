@@ -126,8 +126,8 @@ body {
 }
 
 .page-section {
-    padding: 28px 32px;
-    margin: 0 -32px;
+    padding: 28px 16px;
+    margin: 0 -16px;
     border-top: 1px solid #E2E8F0;
 }
 

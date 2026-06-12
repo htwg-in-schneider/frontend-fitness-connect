@@ -32,7 +32,7 @@ const email = defineModel('email', { default: '' })
     align-items: center;
     justify-content: center;
     border-top: none;
-    padding: 48px 32px;
+    padding: 48px 16px;
     scroll-margin-top: 60px;
 }
 

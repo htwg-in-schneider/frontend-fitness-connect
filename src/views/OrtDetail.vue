@@ -69,7 +69,7 @@ const mapsFullUrl = computed(() => {
           class="maps-iframe"
           frameborder="0"
           allowfullscreen
-          referrerpolicy="no-referrer"
+          referrerpolicy="strict-origin-when-cross-origin"
         />
         <a
           :href="mapsFullUrl"

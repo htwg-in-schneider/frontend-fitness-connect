@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useOrteStore } from '../stores/orte.js'
 import { useEventsStore } from '../stores/events.js'
@@ -24,19 +24,63 @@ const eventsAtOrt = computed(() =>
   eventsStore.list.filter(e => e.ort?.id === Number(route.params.id))
 )
 
-const MAPS_KEY = 'AIzaSyD5SK0PNw1mQaSHvO0gjBT6cUQ_BeIzk-k'
+const mapCoords = ref(null)
 
 const mapsEmbedUrl = computed(() => {
-  if (!ort.value?.adresse) return null
-  const q = encodeURIComponent(ort.value.adresse + ', Konstanz')
-  return `https://www.google.com/maps/embed/v1/place?key=${MAPS_KEY}&q=${q}&zoom=17`
+  if (!mapCoords.value) return null
+  const { lat, lon } = mapCoords.value
+  const delta = 0.005
+  const bbox = `${lon - delta},${lat - delta},${lon + delta},${lat + delta}`
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${encodeURIComponent(bbox)}&layer=mapnik&marker=${lat}%2C${lon}`
 })
 
 const mapsFullUrl = computed(() => {
   if (!ort.value?.adresse) return null
-  const q = encodeURIComponent(ort.value.adresse + ', Konstanz')
-  return `https://www.google.com/maps/search/?api=1&query=${q}`
+  if (mapCoords.value) {
+    const { lat, lon } = mapCoords.value
+    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=17/${lat}/${lon}`
+  }
+  const q = encodeURIComponent(`${ort.value.adresse}, Konstanz`)
+  return `https://www.openstreetmap.org/search?query=${q}`
 })
+
+watch(
+  () => ort.value?.adresse,
+  async (address) => {
+    if (!address) {
+      mapCoords.value = null
+      return
+    }
+
+    const query = encodeURIComponent(`${address}, Konstanz`)
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${query}`
+      )
+
+      if (!response.ok) {
+        mapCoords.value = null
+        return
+      }
+
+      const data = await response.json()
+      const firstResult = data?.[0]
+      if (!firstResult) {
+        mapCoords.value = null
+        return
+      }
+
+      mapCoords.value = {
+        lat: Number(firstResult.lat),
+        lon: Number(firstResult.lon)
+      }
+    } catch {
+      mapCoords.value = null
+    }
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
@@ -63,8 +107,9 @@ const mapsFullUrl = computed(() => {
       </div>
 
       <!-- Map Card -->
-      <div v-if="mapsEmbedUrl" class="map-card">
+      <div v-if="mapsEmbedUrl || mapsFullUrl" class="map-card">
         <iframe
+          v-if="mapsEmbedUrl"
           :src="mapsEmbedUrl"
           class="maps-iframe"
           frameborder="0"
@@ -76,7 +121,7 @@ const mapsFullUrl = computed(() => {
           target="_blank"
           rel="noopener noreferrer"
           class="maps-link"
-        >In Google Maps öffnen →</a>
+        >In OpenStreetMap öffnen →</a>
       </div>
 
       <!-- Info Card -->

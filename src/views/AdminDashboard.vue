@@ -250,6 +250,10 @@ function statusClass(s) {
   if (s === 'FAILURE') return 'status-badge status-failure'
   return 'status-badge status-pending'
 }
+
+function hasAuditDetails(log) {
+  return typeof log?.details === 'string' && log.details.trim().length > 0
+}
 </script>
 
 <template>
@@ -447,7 +451,13 @@ function statusClass(s) {
                 <td>{{ log.id }}</td>
                 <td>{{ formatDate(log.timestamp) }}</td>
                 <td class="audit-userid">{{ log.nutzer ? (log.nutzer.vorname + ' ' + log.nutzer.nachname) : '-' }}</td>
-                <td>{{ log.action }}</td>
+                <td class="audit-action-cell">
+                  <span>{{ log.action }}</span>
+                  <span v-if="hasAuditDetails(log)" class="audit-info" aria-label="Details vorhanden" tabindex="0">
+                    i
+                    <span class="audit-info-tooltip">{{ log.details }}</span>
+                  </span>
+                </td>
                 <td>{{ log.entityType }}</td>
                 <td>{{ log.entityId ?? '-' }}</td>
                 <td><span :class="statusClass(log.status)">{{ statusLabel(log.status) }}</span></td>
@@ -688,6 +698,13 @@ function statusClass(s) {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.audit-action-cell {
+  overflow: visible !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 .status-badge {
   display: inline-block;
   padding: 2px 10px;
@@ -707,6 +724,48 @@ function statusClass(s) {
 .status-pending {
   background: #FEF9C3;
   color: #CA8A04;
+}
+.audit-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #C00000;
+  color: #C00000;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: help;
+  background: #FFF1F2;
+  user-select: none;
+}
+.audit-info-tooltip {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  min-width: 180px;
+  max-width: 320px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #FECACA;
+  background: #FEF2F2;
+  color: #7F1D1D;
+  font-size: 11px;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: 0 8px 24px rgba(127, 29, 29, 0.15);
+  z-index: 5;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.audit-info:hover .audit-info-tooltip,
+.audit-info:focus-visible .audit-info-tooltip {
+  opacity: 1;
+  visibility: visible;
 }
 </style>
 

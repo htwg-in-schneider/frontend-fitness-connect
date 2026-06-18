@@ -8,6 +8,9 @@ import NavBar from '../components/NavBar.vue'
 import Button from '../components/Button.vue'
 import NavigationLink from '../components/NavigationLink.vue'
 import { MapPin, Calendar, Armchair, User } from 'lucide-vue-next'
+import applePayIcon from '../assets/icons/applepay.svg'
+import googlePayIcon from '../assets/icons/googlepay.svg'
+import paypalIcon from '../assets/icons/paypal.svg'
 
 const API = import.meta.env.VITE_API_BASE_URL
 
@@ -18,6 +21,13 @@ const eventsStore = useEventsStore()
 const trainer = ref(null)
 const bereitsAngemeldet = ref(false)
 const showKursModal = ref(false)
+const selectedPayment = ref(null)
+
+const paymentMethods = [
+  { id: 'applepay', name: 'Apple Pay', icon: applePayIcon },
+  { id: 'googlepay', name: 'Google Pay', icon: googlePayIcon },
+  { id: 'paypal', name: 'PayPal', icon: paypalIcon },
+]
 
 onMounted(async () => {
   await eventsStore.fetchAll()
@@ -171,6 +181,18 @@ function renderStars(rating) {
                 <span class="price-label price-bold">Gesamtpreis</span>
                 <span class="price-value price-bold">{{ event.preis.toFixed(2) }} €</span>
               </div>
+              <p class="detail-section-title payment-title">Zahlungsmethode</p>
+              <div class="payment-methods">
+                <button
+                  v-for="method in paymentMethods"
+                  :key="method.id"
+                  class="payment-method-btn"
+                  :class="{ 'payment-method-btn--selected': selectedPayment?.id === method.id }"
+                  @click="selectedPayment = method"
+                >
+                  <img :src="method.icon" :alt="method.name" class="payment-icon" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -179,8 +201,8 @@ function renderStars(rating) {
           <Button variant="secondary" :disabled="true">Bereits angemeldet</Button>
           <Button variant="danger" @click="abmelden">Abmelden</Button>
         </div>
-        <Button v-else :disabled="istVoll" @click="handleTeilnehmen">
-          {{ istVoll ? 'Ausgebucht' : 'Jetzt bezahlen' }}
+        <Button v-else :disabled="istVoll || !selectedPayment" @click="handleTeilnehmen">
+          {{ istVoll ? 'Ausgebucht' : (selectedPayment ? 'Jetzt bezahlen' : 'Zahlungsmethode wählen') }}
         </Button>
       </template>
 
@@ -232,10 +254,13 @@ function renderStars(rating) {
       <!-- Kurs beitreten Modal -->
       <div v-if="showKursModal" class="modal-overlay" @click.self="showKursModal = false">
         <div class="modal-card">
-          <p class="modal-text">Kostenpflichtig beitreten?</p>
+          <p class="modal-text">{{ event.preis.toFixed(2) }} € kostenpflichtig beitreten?</p>
           <div class="modal-actions">
             <button class="modal-btn modal-btn--cancel" @click="showKursModal = false">Abbrechen</button>
-            <button class="modal-btn modal-btn--confirm" @click="beitreten">Ja</button>
+            <button class="modal-btn modal-btn--confirm" @click="beitreten">
+              <img :src="selectedPayment.icon" :alt="selectedPayment.name" class="modal-payment-icon" />
+              {{ selectedPayment.name }}
+            </button>
           </div>
         </div>
       </div>
@@ -550,20 +575,44 @@ function renderStars(rating) {
   margin-top: 16px;
 }
 
-.apple-pay-btn {
-  width: 100%;
-  background: #FFFFFF;
-  border: 2px solid #1E293B;
+.payment-methods {
+  display: flex;
+  gap: 8px;
+}
+
+.payment-method-btn {
+  flex: 1;
+  background: #F8FAFC;
+  border: 2px solid #E2E8F0;
   border-radius: 12px;
+  padding: 8px 6px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.apple-pay-img {
-  height: 50px;
+.payment-method-btn:hover {
+  border-color: #94A3B8;
+  background: #F1F5F9;
+}
+
+.payment-method-btn--selected {
+  border-color: #C00000;
+  background: #FFF5F5;
+}
+
+.payment-icon {
+  height: 28px;
   object-fit: contain;
+}
+
+.modal-payment-icon {
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 6px;
 }
 
 /* Not found */

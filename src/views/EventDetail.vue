@@ -11,6 +11,7 @@ import { MapPin, Calendar, Armchair, User } from 'lucide-vue-next'
 import applePayIcon from '../assets/icons/applepay.svg'
 import googlePayIcon from '../assets/icons/googlepay.svg'
 import paypalIcon from '../assets/icons/paypal.svg'
+import mastercardIcon from '../assets/icons/mastercard.svg'
 
 const API = import.meta.env.VITE_API_BASE_URL
 
@@ -27,7 +28,60 @@ const paymentMethods = [
   { id: 'applepay', name: 'Apple Pay', icon: applePayIcon },
   { id: 'googlepay', name: 'Google Pay', icon: googlePayIcon },
   { id: 'paypal', name: 'PayPal', icon: paypalIcon },
+  { id: 'mastercard', name: 'Mastercard', icon: mastercardIcon },
 ]
+
+// Mastercard form
+const cardNumber = ref('')
+const cardHolder = ref('')
+const cardExpiry = ref('')
+const cardCvc = ref('')
+const cardErrors = ref({})
+
+function formatCardNumber(e) {
+  let val = e.target.value.replace(/\D/g, '').slice(0, 16)
+  cardNumber.value = val.replace(/(\d{4})(?=\d)/g, '$1 ')
+}
+
+function formatExpiry(e) {
+  let val = e.target.value.replace(/\D/g, '').slice(0, 4)
+  if (val.length >= 3) val = val.slice(0, 2) + '/' + val.slice(2)
+  cardExpiry.value = val
+}
+
+function validateCard() {
+  const errors = {}
+  const num = cardNumber.value.replace(/\s/g, '')
+  if (!/^\d{16}$/.test(num)) errors.cardNumber = 'Ungültige Kartennummer'
+  if (!cardHolder.value.trim() || cardHolder.value.trim().length < 2) errors.cardHolder = 'Name erforderlich'
+  const [mm, yy] = (cardExpiry.value || '').split('/')
+  const month = parseInt(mm, 10)
+  const year = parseInt('20' + yy, 10)
+  const now = new Date()
+  if (!mm || !yy || month < 1 || month > 12 || year < now.getFullYear() ||
+      (year === now.getFullYear() && month < now.getMonth() + 1)) {
+    errors.cardExpiry = 'Ungültiges Ablaufdatum'
+  }
+  if (!/^\d{3}$/.test(cardCvc.value)) errors.cardCvc = 'Ungültiger CVC'
+  cardErrors.value = errors
+  return Object.keys(errors).length === 0
+}
+
+function resetCardForm() {
+  cardNumber.value = ''
+  cardHolder.value = ''
+  cardExpiry.value = ''
+  cardCvc.value = ''
+  cardErrors.value = {}
+}
+
+function handleModalConfirm() {
+  if (selectedPayment.value?.id === 'mastercard') {
+    if (validateCard()) beitreten()
+  } else {
+    beitreten()
+  }
+}
 
 onMounted(async () => {
   await eventsStore.fetchAll()
@@ -75,6 +129,7 @@ function handleTeilnehmen() {
 
 async function beitreten() {
   showKursModal.value = false
+  resetCardForm()
   try {
     const token = await getAccessTokenSilently()
     const res = await fetch(`${API}/api/anmeldungen/${route.params.id}`, {
@@ -254,10 +309,69 @@ function renderStars(rating) {
       <!-- Kurs beitreten Modal -->
       <div v-if="showKursModal" class="modal-overlay" @click.self="showKursModal = false">
         <div class="modal-card">
+          <div class="modal-header">
+            <img :src="selectedPayment.icon" :alt="selectedPayment.name" class="modal-header-icon" />
+            <span class="modal-header-title">{{ selectedPayment.name }}</span>
+          </div>
           <p class="modal-text">{{ event.preis.toFixed(2) }} € kostenpflichtig beitreten?</p>
+
+          <!-- Mastercard form -->
+          <template v-if="selectedPayment.id === 'mastercard'">
+            <div class="card-form">
+              <div class="card-field">
+                <label class="card-label">Kartennummer</label>
+                <input
+                  class="card-input"
+                  :class="{ 'card-input--error': cardErrors.cardNumber }"
+                  :value="cardNumber"
+                  @input="formatCardNumber"
+                  placeholder="1234 5678 9012 3456"
+                  maxlength="19"
+                />
+                <span v-if="cardErrors.cardNumber" class="card-error">{{ cardErrors.cardNumber }}</span>
+              </div>
+              <div class="card-field">
+                <label class="card-label">Karteninhaber</label>
+                <input
+                  class="card-input"
+                  :class="{ 'card-input--error': cardErrors.cardHolder }"
+                  v-model="cardHolder"
+                  placeholder="Max Mustermann"
+                />
+                <span v-if="cardErrors.cardHolder" class="card-error">{{ cardErrors.cardHolder }}</span>
+              </div>
+              <div class="card-row">
+                <div class="card-field">
+                  <label class="card-label">Ablaufdatum</label>
+                  <input
+                    class="card-input"
+                    :class="{ 'card-input--error': cardErrors.cardExpiry }"
+                    :value="cardExpiry"
+                    @input="formatExpiry"
+                    placeholder="MM/JJ"
+                    maxlength="5"
+                  />
+                  <span v-if="cardErrors.cardExpiry" class="card-error">{{ cardErrors.cardExpiry }}</span>
+                </div>
+                <div class="card-field">
+                  <label class="card-label">CVC</label>
+                  <input
+                    class="card-input"
+                    :class="{ 'card-input--error': cardErrors.cardCvc }"
+                    v-model="cardCvc"
+                    placeholder="123"
+                    maxlength="3"
+                    inputmode="numeric"
+                  />
+                  <span v-if="cardErrors.cardCvc" class="card-error">{{ cardErrors.cardCvc }}</span>
+                </div>
+              </div>
+            </div>
+          </template>
+
           <div class="modal-actions">
-            <button class="modal-btn modal-btn--cancel" @click="showKursModal = false">Abbrechen</button>
-            <button class="modal-btn modal-btn--confirm" @click="beitreten">
+            <button class="modal-btn modal-btn--cancel" @click="showKursModal = false; resetCardForm()">Abbrechen</button>
+            <button class="modal-btn modal-btn--confirm" @click="handleModalConfirm">
               <img :src="selectedPayment.icon" :alt="selectedPayment.name" class="modal-payment-icon" />
               {{ selectedPayment.name }}
             </button>
@@ -692,6 +806,81 @@ function renderStars(rating) {
 
 .modal-btn--confirm:hover {
   background: #A00000;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.modal-header-icon {
+  height: 28px;
+  object-fit: contain;
+}
+
+.modal-header-title {
+  font-size: 16px;
+  font-weight: bold;
+  font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
+  color: #1E293B;
+}
+
+/* Card form */
+.card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.card-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: bold;
+  font-family: "Arial", sans-serif;
+  color: #64748B;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.card-input {
+  padding: 9px 11px;
+  border: 1.5px solid #E2E8F0;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: "Arial", sans-serif;
+  color: #1E293B;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #F8FAFC;
+}
+
+.card-input:focus {
+  border-color: #94A3B8;
+  background: #fff;
+}
+
+.card-input--error {
+  border-color: #C00000;
+}
+
+.card-error {
+  font-size: 11px;
+  color: #C00000;
+  font-family: "Arial", sans-serif;
 }
 </style>
 

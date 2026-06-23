@@ -18,8 +18,8 @@ const email = defineModel('email', { default: '' })
             <div class="login-form">
                 <h3 class="login-title">Jetzt Registrieren:</h3>
                 <input class="login-input" type="text" placeholder="E-Mail" v-model="email">
-                <Button @click="loginWithRedirect({ authorizationParams: { screen_hint: 'signup', login_hint: email } })">Registrieren</Button>
-                <NavigationLink @click="loginWithRedirect({ authorizationParams: { login_hint: email } })">Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
+                <Button>Registrieren</Button>
+                <NavigationLink>Hast du bereits einen Account? <br>Jetzt Anmelden</NavigationLink>
             </div>
         </div>
     </section>

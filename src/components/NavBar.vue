@@ -43,7 +43,7 @@ function handleLogout() {
         </ul>
         <div class="topnav-auth">
             <template v-if="!isAuthenticated">
-                <button class="auth-btn">Anmelden</button>
+                <button class="auth-btn" @click="loginWithRedirect()">Anmelden</button>
                 <button class="auth-btn auth-btn--primary">Registrieren</button>
             </template>
             <template v-else>

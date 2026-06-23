@@ -5,7 +5,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import { formatEventDate } from '../utils.js'
 import NavBar from '../components/NavBar.vue'
 import NavigationLink from '../components/NavigationLink.vue'
-import { Pencil, Calendar, Trash2, LogOut } from 'lucide-vue-next'
+import { Pencil, Calendar, Trash2, LogOut, Plus } from 'lucide-vue-next'
 
 const API = import.meta.env.VITE_API_BASE_URL
 const router = useRouter()
@@ -99,7 +99,12 @@ onMounted(async () => {
         <NavigationLink @click="router.back()">← Zurück</NavigationLink>
       </div>
 
-      <h1 class="page-title"><Calendar :size="20" /> Meine Events</h1>
+      <div class="page-title-row">
+        <h1 class="page-title"><Calendar :size="20" /> Meine Events</h1>
+        <button class="add-btn" @click="router.push('/event-erstellen')" title="Event erstellen">
+          <Plus :size="18" />
+        </button>
+      </div>
 
       <div v-if="events.length === 0" class="keine-ergebnisse">
         Du hast noch keine Events erstellt.
@@ -167,15 +172,40 @@ onMounted(async () => {
   margin-bottom: 12px;
 }
 
+.page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
 .page-title {
   font-size: 22px;
   font-weight: bold;
   font-family: "Arial Rounded MT Bold", "Arial", sans-serif;
   color: #1E293B;
-  margin-bottom: 20px;
+  margin-bottom: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.add-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: none;
+  background: #C00000;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.add-btn:hover {
+  background: #A00000;
 }
 
 .keine-ergebnisse {

@@ -13,7 +13,7 @@ import TrainerSection from '../components/TrainerSection.vue'
 import ContactSection from '../components/ContactSection.vue'
 
 const router = useRouter()
-const { isAuthenticated, getAccessTokenSilently } = useAuth0()
+const { isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0()
 const trainerStore = useTrainerStore()
 const orteStore = useOrteStore()
 const eventsStore = useEventsStore()
@@ -58,12 +58,15 @@ onMounted(() => {
   trainerStore.fetchAll()
   orteStore.fetchAll()
   eventsStore.fetchAll()
-  if (isAuthenticated.value) loadProfile()
 })
 
-watch(isAuthenticated, (authenticated) => {
-  if (authenticated) loadProfile()
-})
+watch(
+  () => isLoading.value,
+  (loading) => {
+    if (!loading && isAuthenticated.value) loadProfile()
+  },
+  { immediate: true }
+)
 </script>
 
 <template>

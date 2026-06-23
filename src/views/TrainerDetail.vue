@@ -171,6 +171,7 @@ async function submitRating() {
 <style scoped>
 .detail-page {
   max-width: 1000px;
+  margin: 0 auto;
   padding: 0 16px 40px;
   display: flex;
   flex-direction: column;

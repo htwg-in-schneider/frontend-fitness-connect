@@ -23,6 +23,7 @@ const trainer = ref(null)
 const bereitsAngemeldet = ref(false)
 const showKursModal = ref(false)
 const selectedPayment = ref(null)
+const meineNutzerId = ref(null)
 
 const paymentMethods = [
   { id: 'applepay', name: 'Apple Pay', icon: applePayIcon },
@@ -87,7 +88,22 @@ onMounted(async () => {
   await eventsStore.fetchAll()
   await fetchTrainer()
   await checkAnmeldung()
+  await fetchMeineId()
 })
+
+async function fetchMeineId() {
+  if (!isAuthenticated.value) return
+  try {
+    const token = await getAccessTokenSilently()
+    const res = await fetch(`${API}/api/nutzer/me`, {
+      headers: { 'Authorization': `Bearer ${token}` },
+    })
+    if (res.ok) {
+      const data = await res.json()
+      meineNutzerId.value = data.id
+    }
+  } catch (_) {}
+}
 
 watch(() => route.params.id, async () => {
   await fetchTrainer()
@@ -118,6 +134,8 @@ async function checkAnmeldung() {
 
 const event = computed(() => eventsStore.list.find(e => e.id === Number(route.params.id)))
 const istVoll = computed(() => event.value && event.value.anzahlAnmeldungen >= event.value.anzahlPlaetze)
+const istVergangen = computed(() => event.value && event.value.date < new Date())
+const istEigenes = computed(() => event.value && meineNutzerId.value && event.value.ersteller === String(meineNutzerId.value))
 
 function handleTeilnehmen() {
   if (event.value?.preis) {
@@ -256,8 +274,8 @@ function renderStars(rating) {
           <Button variant="secondary" :disabled="true">Bereits angemeldet</Button>
           <Button variant="danger" @click="abmelden">Abmelden</Button>
         </div>
-        <Button v-else :disabled="istVoll || !selectedPayment" @click="handleTeilnehmen">
-          {{ istVoll ? 'Ausgebucht' : (selectedPayment ? 'Jetzt bezahlen' : 'Zahlungsmethode wählen') }}
+        <Button v-else :disabled="istVoll || istVergangen || istEigenes || !selectedPayment" @click="handleTeilnehmen">
+          {{ istVergangen ? 'Event bereits vorbei' : istEigenes ? 'Eigenes Event' : istVoll ? 'Ausgebucht' : (selectedPayment ? 'Jetzt bezahlen' : 'Zahlungsmethode wählen') }}
         </Button>
       </template>
 
@@ -301,8 +319,8 @@ function renderStars(rating) {
           <Button variant="secondary" :disabled="true">Bereits angemeldet</Button>
           <Button variant="danger" @click="abmelden">Abmelden</Button>
         </div>
-        <Button v-else :disabled="istVoll" @click="handleTeilnehmen">
-          {{ istVoll ? 'Ausgebucht' : 'Teilnehmen' }}
+        <Button v-else :disabled="istVoll || istVergangen || istEigenes" @click="handleTeilnehmen">
+          {{ istVergangen ? 'Event bereits vorbei' : istEigenes ? 'Eigenes Event' : istVoll ? 'Ausgebucht' : 'Teilnehmen' }}
         </Button>
       </template>
 

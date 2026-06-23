@@ -14,7 +14,7 @@ export const useOrteStore = defineStore('orte', {
   }),
   actions: {
     async fetchAll() {
-      if (this.list.length) return
+
       await this.search({})
     },
     async fetchArten() {

@@ -25,7 +25,7 @@ export const useEventsStore = defineStore('events', {
   }),
   actions: {
     async fetchAll() {
-      if (this.list.length) return
+
       await this.search({})
     },
     async fetchSportarten() {

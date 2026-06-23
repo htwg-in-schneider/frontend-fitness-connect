@@ -11,7 +11,6 @@ export const useTrainerStore = defineStore('trainer', {
   }),
   actions: {
     async fetchAll() {
-      if (this.list.length) return
       await this.search({})
     },
     async fetchArten() {

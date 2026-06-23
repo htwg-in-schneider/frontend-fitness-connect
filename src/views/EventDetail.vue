@@ -254,18 +254,20 @@ function renderStars(rating) {
                 <span class="price-label price-bold">Gesamtpreis</span>
                 <span class="price-value price-bold">{{ event.preis.toFixed(2) }} €</span>
               </div>
-              <p class="detail-section-title payment-title">Zahlungsmethode</p>
-              <div class="payment-methods">
-                <button
-                  v-for="method in paymentMethods"
-                  :key="method.id"
-                  class="payment-method-btn"
-                  :class="{ 'payment-method-btn--selected': selectedPayment?.id === method.id }"
-                  @click="selectedPayment = method"
-                >
+              <template v-if="!bereitsAngemeldet">
+                <p class="detail-section-title payment-title">Zahlungsmethode</p>
+                <div class="payment-methods">
+                  <button
+                    v-for="method in paymentMethods"
+                    :key="method.id"
+                    class="payment-method-btn"
+                    :class="{ 'payment-method-btn--selected': selectedPayment?.id === method.id }"
+                    @click="selectedPayment = method"
+                  >
                   <img :src="method.icon" :alt="method.name" class="payment-icon" />
                 </button>
               </div>
+              </template>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
 import { authGuard } from '@auth0/auth0-vue'
 import Dashboard from '../views/Dashboard.vue'
 import EventDetail from '../views/EventDetail.vue'
@@ -36,10 +36,8 @@ const routes = [
   { path: '/admin', component: AdminDashboard, beforeEnter: authGuard },
 ]
 
-// import.meta.env.BASE_URL picks up the `base` from vite.config.js
-// which is set to the repo sub-path for GitHub Pages deployments.
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 

@@ -41,7 +41,7 @@ function handleEventClick(eventId) {
                 </div>
                 <div class="event-card-body">
                     <h3 class="event-title">{{ event.name }}</h3>
-                    <p class="event-detail"><MapPin :size="13" /> {{ event.ort.name }}</p>
+                    <p class="event-detail"><MapPin :size="13" /> {{ event.ort?.name ?? 'Kein Ort' }}</p>
                     <p class="event-detail"><Calendar :size="13" /> {{ formatEventDate(event.date) }}</p>
                     <p class="event-spots">{{ event.anzahlPlaetze - event.anzahlAnmeldungen }}/{{ event.anzahlPlaetze }} Plätze frei</p>
                     <Button @click="handleEventClick(event.id)">Ansehen</Button>

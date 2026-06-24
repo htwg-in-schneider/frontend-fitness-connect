@@ -180,6 +180,14 @@ watch(
   gap: 16px;
 }
 
+@media (max-width: 768px) {
+  .detail-page {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 8px 40px;
+  }
+}
+
 /* back row */
 .back-row {
   display: flex;

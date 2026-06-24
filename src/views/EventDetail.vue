@@ -466,6 +466,12 @@ function renderStars(rating) {
 }
 
 @media (max-width: 768px) {
+  .detail-page {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 8px 40px;
+  }
+
   .detail-grid {
     grid-template-columns: 1fr;
   }

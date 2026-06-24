@@ -5,6 +5,7 @@ import { useAuth0 } from '@auth0/auth0-vue'
 import SpecialBanner from './components/SpecialBanner.vue'
 import MobileBottomNav from './components/MobileBottomNav.vue'
 import SiteFooter from './components/SiteFooter.vue'
+import ChatWidget from './components/ChatWidget.vue'
 import { useBannerStore } from './stores/banner.js'
 
 const bannerStore = useBannerStore()
@@ -37,6 +38,7 @@ watchEffect(() => {
   <router-view />
   <SiteFooter />
   <MobileBottomNav />
+  <ChatWidget />
 </template>
 
 <style scoped></style>

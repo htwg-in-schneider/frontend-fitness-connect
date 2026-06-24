@@ -1,8 +1,10 @@
 <script setup>
-import { ref, nextTick, watch } from 'vue'
+import { ref, nextTick, watch, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { MessageCircle, X, Send, MapPin, Calendar, User, Dumbbell } from 'lucide-vue-next'
 
 const API = import.meta.env.VITE_API_BASE_URL
+const router = useRouter()
 
 const isOpen = ref(false)
 const draft = ref('')
@@ -24,6 +26,44 @@ async function scrollToBottom() {
   if (messagesEl.value) {
     messagesEl.value.scrollTop = messagesEl.value.scrollHeight
   }
+}
+
+/**
+ * Parses the answer text and splits it into segments of text and data markers.
+ * Markers look like ⟦EVENT:0⟧, ⟦ORT:1⟧, ⟦TRAINER:0⟧
+ */
+function parseSegments(msg) {
+  const markerRegex = /⟦(EVENT|ORT|TRAINER):(\d+)⟧/g
+  const segments = []
+  let lastIndex = 0
+  let match
+
+  while ((match = markerRegex.exec(msg.text)) !== null) {
+    if (match.index > lastIndex) {
+      segments.push({ type: 'text', content: msg.text.slice(lastIndex, match.index) })
+    }
+    const dataType = match[1]
+    const index = parseInt(match[2], 10)
+    let data = null
+    if (dataType === 'EVENT') data = msg.events?.[index]
+    else if (dataType === 'ORT') data = msg.orte?.[index]
+    else if (dataType === 'TRAINER') data = msg.trainer?.[index]
+
+    if (data) {
+      segments.push({ type: dataType.toLowerCase(), data })
+    }
+    lastIndex = match.index + match[0].length
+  }
+
+  if (lastIndex < (msg.text?.length || 0)) {
+    segments.push({ type: 'text', content: msg.text.slice(lastIndex) })
+  }
+
+  if (segments.length === 0 && msg.text) {
+    segments.push({ type: 'text', content: msg.text })
+  }
+
+  return segments
 }
 
 async function sendMessage() {
@@ -103,59 +143,61 @@ watch(isOpen, (open) => {
             class="chat-bubble-wrapper"
             :class="msg.from === 'user' ? 'from-user' : 'from-bot'"
           >
-            <div class="chat-message" :class="msg.from === 'user' ? 'msg-user' : 'msg-bot'">
+            <!-- User messages: plain text -->
+            <div v-if="msg.from === 'user'" class="chat-message msg-user">
               {{ msg.text }}
             </div>
 
-            <!-- Events -->
-            <div v-if="msg.events && msg.events.length" class="card-list">
-              <div v-for="event in msg.events" :key="'e' + event.id" class="info-card event-card">
-                <div class="card-header">
-                  <Dumbbell :size="14" />
-                  <span class="card-title">{{ event.name }}</span>
-                  <span class="card-badge" :class="event.typ === 'KURS' ? 'badge-kurs' : 'badge-event'">
-                    {{ event.typ }}
-                  </span>
-                </div>
-                <div class="card-details">
-                  <span v-if="event.sportart">{{ event.sportart }}</span>
-                  <span v-if="event.ortName"><MapPin :size="12" /> {{ event.ortName }}</span>
-                  <span v-if="event.zeit"><Calendar :size="12" /> {{ formatDate(event.zeit) }}</span>
-                  <span v-if="event.kostenlos" class="card-free">Kostenlos</span>
-                  <span v-else-if="event.preis" class="card-price">{{ event.preis.toFixed(2) }} €</span>
-                </div>
-              </div>
-            </div>
+            <!-- Bot messages: parsed segments with inline cards -->
+            <template v-else>
+              <template v-for="(seg, j) in parseSegments(msg)" :key="j">
+                <span v-if="seg.type === 'text'" class="chat-text-segment">{{ seg.content }}</span>
 
-            <!-- Orte -->
-            <div v-if="msg.orte && msg.orte.length" class="card-list">
-              <div v-for="ort in msg.orte" :key="'o' + ort.id" class="info-card ort-card">
-                <div class="card-header">
-                  <MapPin :size="14" />
-                  <span class="card-title">{{ ort.name }}</span>
-                  <span v-if="ort.art" class="card-badge badge-art">{{ ort.art }}</span>
+                <!-- Inline Event Card -->
+                <div v-else-if="seg.type === 'event'" class="info-card event-card clickable" @click="router.push('/event/' + seg.data.id)">
+                  <div class="card-header">
+                    <Dumbbell :size="14" />
+                    <span class="card-title">{{ seg.data.name }}</span>
+                    <span class="card-badge" :class="seg.data.typ === 'KURS' ? 'badge-kurs' : 'badge-event'">
+                      {{ seg.data.typ }}
+                    </span>
+                  </div>
+                  <div class="card-details">
+                    <span v-if="seg.data.sportart">{{ seg.data.sportart }}</span>
+                    <span v-if="seg.data.ortName"><MapPin :size="12" /> {{ seg.data.ortName }}</span>
+                    <span v-if="seg.data.zeit"><Calendar :size="12" /> {{ formatDate(seg.data.zeit) }}</span>
+                    <span v-if="seg.data.kostenlos" class="card-free">Kostenlos</span>
+                    <span v-else-if="seg.data.preis" class="card-price">{{ seg.data.preis.toFixed(2) }} €</span>
+                  </div>
                 </div>
-                <div class="card-details">
-                  <span v-if="ort.adresse">{{ ort.adresse }}</span>
-                </div>
-              </div>
-            </div>
 
-            <!-- Trainer -->
-            <div v-if="msg.trainer && msg.trainer.length" class="card-list">
-              <div v-for="t in msg.trainer" :key="'t' + t.id" class="info-card trainer-card">
-                <div class="card-header">
-                  <User :size="14" />
-                  <span class="card-title">{{ t.name }}</span>
-                  <span v-if="t.bewertung" class="card-badge badge-rating">★ {{ t.bewertung.toFixed(1) }}</span>
+                <!-- Inline Ort Card -->
+                <div v-else-if="seg.type === 'ort'" class="info-card ort-card clickable" @click="router.push('/ort/' + seg.data.id)">
+                  <div class="card-header">
+                    <MapPin :size="14" />
+                    <span class="card-title">{{ seg.data.name }}</span>
+                    <span v-if="seg.data.art" class="card-badge badge-art">{{ seg.data.art }}</span>
+                  </div>
+                  <div class="card-details">
+                    <span v-if="seg.data.adresse">{{ seg.data.adresse }}</span>
+                  </div>
                 </div>
-                <div class="card-details">
-                  <span v-if="t.trainerart">{{ t.trainerart }}</span>
-                  <span v-if="t.email">✉ {{ t.email }}</span>
-                  <span v-if="t.telefonnummer">☎ {{ t.telefonnummer }}</span>
+
+                <!-- Inline Trainer Card -->
+                <div v-else-if="seg.type === 'trainer'" class="info-card trainer-card clickable" @click="router.push('/trainer/' + seg.data.id)">
+                  <div class="card-header">
+                    <User :size="14" />
+                    <span class="card-title">{{ seg.data.name }}</span>
+                    <span v-if="seg.data.bewertung" class="card-badge badge-rating">★ {{ seg.data.bewertung.toFixed(1) }}</span>
+                  </div>
+                  <div class="card-details">
+                    <span v-if="seg.data.trainerart">{{ seg.data.trainerart }}</span>
+                    <span v-if="seg.data.email">✉ {{ seg.data.email }}</span>
+                    <span v-if="seg.data.telefonnummer">☎ {{ seg.data.telefonnummer }}</span>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </template>
+            </template>
           </div>
 
           <div v-if="loading" class="chat-bubble-wrapper from-bot">
@@ -287,10 +329,22 @@ watch(isOpen, (open) => {
 
 .chat-bubble-wrapper.from-bot {
   align-self: flex-start;
+  background: #fff;
+  border-radius: 14px;
+  border-bottom-left-radius: 4px;
+  padding: 10px 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .chat-bubble-wrapper.from-user {
   align-self: flex-end;
+}
+
+.chat-text-segment {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #1E293B;
+  white-space: pre-line;
 }
 
 .chat-message {
@@ -315,20 +369,14 @@ watch(isOpen, (open) => {
 }
 
 /* DTO Cards */
-.card-list {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
-}
-
 .info-card {
-  background: #fff;
+  background: #F8FAFC;
   border: 1px solid #E2E8F0;
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 13px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin: 6px 0;
 }
 
 .card-header {
@@ -407,6 +455,16 @@ watch(isOpen, (open) => {
 
 .trainer-card {
   border-left: 3px solid #7C3AED;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
 }
 
 .chat-typing {

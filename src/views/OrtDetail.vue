@@ -106,37 +106,40 @@ watch(
         </div>
       </div>
 
-      <!-- Map Card -->
-      <div v-if="mapsEmbedUrl || mapsFullUrl" class="map-card">
-        <iframe
-          v-if="mapsEmbedUrl"
-          :src="mapsEmbedUrl"
-          class="maps-iframe"
-          frameborder="0"
-          allowfullscreen
-          referrerpolicy="strict-origin-when-cross-origin"
-        />
-        <a
-          :href="mapsFullUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="maps-link"
-        >In OpenStreetMap öffnen →</a>
-      </div>
+      <!-- Two-column grid: Info left, Map right -->
+      <div class="detail-grid">
+        <!-- Info Card -->
+        <div class="detail-card detail-card--full-height">
+          <h2 class="detail-section-title">Standort-Details</h2>
+          <ul class="info-list">
+            <li>
+              <span class="info-label"><Tag :size="14" /> Art</span>
+              <span class="info-value">{{ ort.art }}</span>
+            </li>
+            <li>
+              <span class="info-label"><MapPin :size="14" /> Adresse</span>
+              <span class="info-value">{{ ort.adresse }}</span>
+            </li>
+          </ul>
+        </div>
 
-      <!-- Info Card -->
-      <div class="detail-card">
-        <h2 class="detail-section-title">Standort-Details</h2>
-        <ul class="info-list">
-          <li>
-            <span class="info-label"><Tag :size="14" /> Art</span>
-            <span class="info-value">{{ ort.art }}</span>
-          </li>
-          <li>
-            <span class="info-label"><MapPin :size="14" /> Adresse</span>
-            <span class="info-value">{{ ort.adresse }}</span>
-          </li>
-        </ul>
+        <!-- Map Card -->
+        <div v-if="mapsEmbedUrl || mapsFullUrl" class="map-card detail-card--full-height">
+          <iframe
+            v-if="mapsEmbedUrl"
+            :src="mapsEmbedUrl"
+            class="maps-iframe"
+            frameborder="0"
+            allowfullscreen
+            referrerpolicy="strict-origin-when-cross-origin"
+          />
+          <a
+            :href="mapsFullUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="maps-link"
+          >In OpenStreetMap öffnen →</a>
+        </div>
       </div>
 
       <!-- Events at this location -->
@@ -180,11 +183,31 @@ watch(
   gap: 16px;
 }
 
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.detail-card--full-height {
+  height: 100%;
+  box-sizing: border-box;
+}
+
 @media (max-width: 768px) {
   .detail-page {
     width: 100%;
     max-width: 100%;
     padding: 0 8px 40px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-card--full-height {
+    height: auto;
   }
 }
 
@@ -259,11 +282,14 @@ watch(
   overflow: hidden;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   background: #FFFFFF;
+  display: flex;
+  flex-direction: column;
 }
 
 .maps-iframe {
   width: 100%;
-  height: 220px;
+  flex: 1;
+  min-height: 220px;
   display: block;
   border: none;
 }

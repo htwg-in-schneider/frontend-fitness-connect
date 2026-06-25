@@ -10,7 +10,7 @@ import { useBannerStore } from './stores/banner.js'
 const bannerStore = useBannerStore()
 const router = useRouter()
 const API = import.meta.env.VITE_API_BASE_URL
-const { isAuthenticated, getAccessTokenSilently } = useAuth0()
+const { isAuthenticated, isLoading, getAccessTokenSilently, logout } = useAuth0()
 
 watch(isAuthenticated, async (authenticated) => {
   if (!authenticated) return
@@ -23,7 +23,8 @@ watch(isAuthenticated, async (authenticated) => {
       router.push('/complete-profile')
     }
   } catch (e) {
-    // ignore – user can retry later
+    // Token-Refresh fehlgeschlagen → Session ungültig, ausloggen
+    logout({ logoutParams: { returnTo: window.location.origin + import.meta.env.BASE_URL } })
   }
 })
 
@@ -34,9 +35,11 @@ watchEffect(() => {
 
 <template>
   <SpecialBanner />
-  <router-view />
-  <SiteFooter />
-  <MobileBottomNav />
+  <template v-if="!isLoading">
+    <router-view />
+    <SiteFooter />
+    <MobileBottomNav />
+  </template>
 </template>
 
 <style scoped></style>

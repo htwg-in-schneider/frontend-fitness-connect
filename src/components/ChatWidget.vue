@@ -1,10 +1,12 @@
 <script setup>
 import { ref, nextTick, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuth0 } from '@auth0/auth0-vue'
 import { MessageCircle, X, Send, MapPin, Calendar, User, Dumbbell } from 'lucide-vue-next'
 
 const API = import.meta.env.VITE_API_BASE_URL
 const router = useRouter()
+const { isAuthenticated, getAccessTokenSilently } = useAuth0()
 
 const isOpen = ref(false)
 const draft = ref('')
@@ -93,9 +95,16 @@ async function sendMessage() {
   scrollToBottom()
 
   try {
+    const headers = { 'Content-Type': 'application/json' }
+    if (isAuthenticated.value) {
+      try {
+        const token = await getAccessTokenSilently()
+        headers['Authorization'] = `Bearer ${token}`
+      } catch (_) { /* unauthenticated fallback */ }
+    }
     const res = await fetch(`${API}/api/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ message: text }),
     })
     if (!res.ok) throw new Error(`HTTP ${res.status}`)

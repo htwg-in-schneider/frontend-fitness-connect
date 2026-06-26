@@ -11,10 +11,26 @@ const draft = ref('')
 const loading = ref(false)
 const messagesEl = ref(null)
 
+// Alle Posen des Trainers aus assets/michis laden
+const michis = Object.values(
+  import.meta.glob('../assets/michis/*.png', { eager: true, import: 'default' })
+)
+const currentMichi = ref(michis[0])
+
+// Wählt zufällig eine andere Pose als die aktuell angezeigte
+function setRandomMichi() {
+  if (michis.length <= 1) return
+  let next = currentMichi.value
+  while (next === currentMichi.value) {
+    next = michis[Math.floor(Math.random() * michis.length)]
+  }
+  currentMichi.value = next
+}
+
 const messages = ref([
   {
     from: 'bot',
-    text: 'Hey Sportsfreund, mir kannst du gerne Fragen zu Events und Trainern stellen.',
+    text: 'Hey Sportsfreund, ich bin Michael, dein Trainer und Helfer für alles. Mir kannst du gerne Fragen zu Events und Trainern stellen.',
     events: [],
     orte: [],
     trainer: [],
@@ -73,6 +89,7 @@ async function sendMessage() {
   messages.value.push({ from: 'user', text, events: [], orte: [], trainer: [] })
   draft.value = ''
   loading.value = true
+  setRandomMichi()
   scrollToBottom()
 
   try {
@@ -100,6 +117,7 @@ async function sendMessage() {
     })
   } finally {
     loading.value = false
+    setRandomMichi()
     scrollToBottom()
   }
 }
@@ -118,12 +136,28 @@ function toggleChat() {
 }
 
 watch(isOpen, (open) => {
-  if (open) scrollToBottom()
+  if (open) {
+    setRandomMichi()
+    scrollToBottom()
+  }
 })
 </script>
 
 <template>
   <div class="chat-widget">
+    <transition name="backdrop-fade">
+      <div v-if="isOpen" class="chat-backdrop" @click="toggleChat">
+        <transition name="michi-swap" mode="out-in">
+          <img
+            :key="currentMichi"
+            :src="currentMichi"
+            class="chat-michi"
+            alt="Michael, dein Trainer"
+          />
+        </transition>
+      </div>
+    </transition>
+
     <transition name="chat-pop">
       <div v-if="isOpen" class="chat-window">
         <div class="chat-header">
@@ -240,6 +274,29 @@ watch(isOpen, (open) => {
   right: 24px;
   z-index: 300;
   font-family: "Arial", sans-serif;
+}
+
+/* Abdunkelnder Overlay hinter dem Chat-Fenster */
+.chat-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(2px);
+  cursor: pointer;
+}
+
+/* Große Pose des Trainers auf der linken Bildschirmhälfte */
+.chat-michi {
+  position: fixed;
+  left: clamp(16px, 5vw, 80px);
+  bottom: 0;
+  height: min(90vh, 900px);
+  max-width: calc(100vw - 420px);
+  object-fit: contain;
+  object-position: bottom;
+  pointer-events: none;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.45));
 }
 
 .chat-toggle {
@@ -548,6 +605,32 @@ watch(isOpen, (open) => {
   transform: scale(0.9) translateY(10px);
 }
 
+.backdrop-fade-enter-active,
+.backdrop-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+
+.backdrop-fade-enter-from,
+.backdrop-fade-leave-to {
+  opacity: 0;
+}
+
+/* Weicher Übergang beim Wechsel der Pose */
+.michi-swap-enter-active,
+.michi-swap-leave-active {
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.michi-swap-enter-from {
+  opacity: 0;
+  transform: translateY(16px) scale(0.98);
+}
+
+.michi-swap-leave-to {
+  opacity: 0;
+  transform: translateY(-16px) scale(0.98);
+}
+
 /* Auf Mobile über der Bottom-Navigation platzieren */
 @media (max-width: 768px) {
   .chat-widget {
@@ -558,6 +641,11 @@ watch(isOpen, (open) => {
   .chat-window {
     bottom: 72px;
     max-height: calc(100vh - 220px);
+  }
+
+  /* Auf kleinen Bildschirmen ist kein Platz für die große Pose */
+  .chat-michi {
+    display: none;
   }
 }
 </style>
